@@ -1,0 +1,1073 @@
+﻿
+@{
+    /**/
+
+    ViewBag.Title = "PhanQuyen";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model User
+
+<style>
+    .form-row:hover {
+        background-color: ghostwhite;
+    }
+
+    .edit {
+        border-radius: 5px;
+        height: 40px;
+        border: 1px solid #ced4da;
+        width: 300px;
+        text-align: center;
+        outline: none;
+        float: right;
+        margin-right: 40px
+    }
+
+    div.container {
+        width: 60%;
+        margin: auto;
+    }
+    /* định dạng thẻ div chưa các button tab */
+    div.tab {
+        overflow: hidden;
+        /*border: 1px solid #ccc;
+        background-color: #f1f1f1;*/
+        padding-left: 40px
+    }
+
+        /* định dạng các button tab */
+        div.tab button {
+            background-color: inherit;
+            float: left;
+            border-color: aliceblue;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+        }
+
+            /* đổi màu khi một button tab được hover */
+            div.tab button:hover {
+                background-color: #ddd;
+            }
+
+            /* đổi màu nền cho tab đang được hiển thị nội dung */
+            div.tab button.active {
+                background-color: #ccc;
+            }
+
+    /* định dạng nội dung hiển thị */
+    .tabcontent {
+        display: none;
+        padding: 6px 12px;
+    }
+
+    .check {
+        float: left;
+        margin-right: 20px
+    }
+
+    tr {
+        text-align: center
+    }
+</style>
+
+<div class="container">
+    <div class="card card-login mx-auto mt-5">
+        <div class="card-header" style="text-align:center">Quản Lý Tài Khoản</div>
+        <div class="card-body">
+            <div class="text-center mb-4">
+                <h4>Nhập User Name Cần Tìm</h4>
+            </div>
+            <form action="/Account/PhanQuyen" method="post" autocomplete="off">
+                @Html.AntiForgeryToken()
+                @{
+                    if (ViewBag.Error == null)
+                    {
+                        @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                    }
+                }
+                <div class="form-group">
+                    <input type="text" id="inputEmail" class="form-control" placeholder="Enter User" required="required" autofocus="autofocus" ng-model="User1" name="user1">
+                </div>
+                <input type="submit" class="btn btn-primary btn-block" value="Tìm tài khoản" />
+            </form>
+        </div>
+    </div>
+</div>
+
+@if (ViewBag.Info != null)
+{
+    User user = ViewBag.Info;
+
+    <div class="container">
+        <div class="card card-register mx-auto mt-5">
+            <div class="card-header" style="text-align:center">
+                Thông tin tài khoản
+            </div>
+            <div class="card-header" style="text-align:center">
+                <div class="tab">
+                    <button class="tablinks active" style="border-right:1px solid inherit">Thông tin tài khoản</button>
+                    <button class="tablinks">Cấp quyền</button>
+                    <button class="tablinks">Quản lý đăng nhập</button>
+                </div>
+                @if (ViewBag.Error != null)
+                {
+                    <span style="color:red">@ViewBag.Error</span>
+                }
+
+                @if (ViewBag.Success != null)
+                {
+                    <span class="text-success">@ViewBag.Success</span>
+                }
+
+                @if (ViewBag.NotFound != null)
+                {
+                    <span style="color:red">@ViewBag.NotFound</span>
+                }
+            </div>
+            <div class="card-body">
+                <div id="Thông tin tài khoản" class="tabcontent">
+                    <div class="form-group">
+                        <div class="form-row">
+                            <div class="col-md-3">
+                                <label class="label label-success">Mr/Ms: </label>
+
+                            </div>
+                            <div class="col-md-9">
+                                <label for="lastName">@user.Name</label>
+                            </div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        <div class="form-row">
+                            <div class="col-md-3">
+                                <label class="label label-success">Họ và tên: </label>
+
+                            </div>
+                            <div class="col-md-9">
+                                <label for="lastName">@user.FullName</label>
+                            </div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        <div class="form-row">
+                            <div class="col-md-3">
+                                <label class="label label-success">Bộ phận: </label>
+
+                            </div>
+                            <div class="col-md-9">
+                                <label for="lastName">@user.BoPhan</label>
+                            </div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        <div class="form-row">
+                            <div class="col-md-3">
+                                <label class="label label-success">User: </label>
+
+                            </div>
+                            <div class="col-md-9">
+                                <label for="lastName">@user.User1</label>
+                            </div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        <div class="form-row">
+                            <div class="col-md-3">
+                                <label class="label label-success">Password: </label>
+
+                            </div>
+                            <div class="col-md-9">
+                                <label for="lastName">******</label>
+                            </div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        <div class="form-row">
+                            <div class="col-md-3">
+                                <label class="label label-success">Email: </label>
+
+                            </div>
+                            <div class="col-md-9">
+                                <label for="lastName">@user.Email</label>
+                            </div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        <div class="form-row">
+                            <div class="col-md-3">
+                                <label class="label label-success">Số điện thoại: </label>
+
+                            </div>
+                            <div class="col-md-9">
+                                @if (user.NumberPhone != null)
+                                {
+                                    string number = "0" + user.NumberPhone.ToString();
+                                    <label for="lastName">@number</label>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        <div style="text-align:center">
+                            <a href="" data-toggle="modal" data-target="#logoutModal" class="btn btn-success">
+                                Chỉnh sửa
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="Cấp quyền" class="tabcontent">
+                    <table class="table table-bordered" id="itable">
+                        <tr>
+                            <td colspan="4" style="font-weight:bold">Các Chức Năng Được Quyền Sử Dụng</td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                @if (user.VIEW_USER.Equals(false))
+                                {
+
+                                    <input id="VIEW_USER" type="checkbox" class="checkbox" ng-model="VIEW_USER" name="VIEW_USER" />
+                                }
+                                else
+                                {
+                                    <input id="VIEW_USER" type="checkbox" class="checkbox" checked ng-model="VIEW_USER" name="VIEW_USER" />
+                                }
+                                Xem Kế Hoạch
+                            </td>
+
+
+                            <td>
+                                @if (user.LAP_KEHOACH.Equals(false))
+                                {
+                                    <input id="LAP_KEHOACH" type="checkbox" class="checkbox" ng-model="LAP_KEHOACH" name="LAP_KEHOACH" />
+                                }
+                                else
+                                {
+                                    <input id="LAP_KEHOACH" type="checkbox" class="checkbox" checked ng-model="LAP_KEHOACH" name="LAP_KEHOACH" />
+                                }
+                                Lập Kế Hoạch
+                            </td>
+
+                            <td>
+                                @if (user.EDIT_KEHOACH.Equals(false))
+                                {
+                                    <input id="EDIT_KEHOACH" type="checkbox" class="checkbox" ng-model="EDIT_KEHOACH" name="EDIT_KEHOACH" />
+                                }
+                                else
+                                {
+                                    <input id="EDIT_KEHOACH" type="checkbox" class="checkbox" checked ng-model="EDIT_KEHOACH" name="EDIT_KEHOACH" />
+                                }
+
+                                Chỉnh Sửa Kế Hoạch
+                            </td>
+
+                            <td>
+                                @if (user.XUAT_EXCEL.Equals(false))
+                                {
+                                    <input id="XUAT_EXCEL" type="checkbox" class="checkbox" ng-model="XUAT_EXCEL" name="XUAT_EXCEL" />
+                                }
+                                else
+                                {
+                                    <input id="XUAT_EXCEL" type="checkbox" class="checkbox" checked ng-model="XUAT_EXCEL" name="XUAT_EXCEL" />
+                                }
+
+                                Xuất Excel
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                @if (user.ADD_STOCK.Equals(false))
+                                {
+                                    <input id="ADD_STOCK" type="checkbox" class="checkbox" ng-model="ADD_STOCK" name="ADD_STOCK" />
+                                }
+                                else
+                                {
+                                    <input id="ADD_STOCK" type="checkbox" class="checkbox" checked ng-model="ADD_STOCK" name="ADD_STOCK" />
+                                }
+
+                                Thêm Code Mới Stock
+                            </td>
+
+                            <td>
+                                @if (user.EDIT_STOCK.Equals(false))
+                                {
+                                    <input id="EDIT_STOCK" type="checkbox" class="checkbox" ng-model="EDIT_STOCK" name="EDIT_STOCK" />
+                                }
+                                else
+                                {
+                                    <input id="EDIT_STOCK" type="checkbox" class="checkbox" checked ng-model="EDIT_STOCK" name="EDIT_STOCK" />
+                                }
+
+                                Chỉnh Sửa Stock
+                            </td>
+
+                            <td colspan="2">
+                                @if (user.DELETE_STOCK.Equals(false))
+                                {
+                                    <input id="DELETE_STOCK" type="checkbox" class="checkbox" ng-model="DELETE_STOCK" name="DELETE_STOCK" />
+                                }
+                                else
+                                {
+                                    <input id="DELETE_STOCK" type="checkbox" class="checkbox" checked ng-model="DELETE_STOCK" name="DELETE_STOCK" />
+                                }
+
+                                Xóa Stock
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                @if (user.ADD_RESINSTOCK.Equals(false))
+                                {
+                                    <input id="ADD_RESINSTOCK" type="checkbox" class="checkbox" ng-model="ADD_RESINSTOCK" name="ADD_RESINSTOCK" />
+                                }
+                                else
+                                {
+                                    <input id="ADD_RESINSTOCK" type="checkbox" class="checkbox" checked ng-model="ADD_RESINSTOCK" name="ADD_RESINSTOCK" />
+                                }
+
+                                Thêm Code Mới Resin Stock
+                            </td>
+
+                            <td>
+                                @if (user.EDIT_RESINSTOCK.Equals(false))
+                                {
+                                    <input id="EDIT_RESINSTOCK" type="checkbox" class="checkbox" ng-model="EDIT_RESINSTOCK" name="EDIT_RESINSTOCK" />
+                                }
+                                else
+                                {
+                                    <input id="EDIT_RESINSTOCK" type="checkbox" class="checkbox" checked ng-model="EDIT_RESINSTOCK" name="EDIT_RESINSTOCK" />
+                                }
+
+                                Chỉnh Sửa Resin Stock
+                            </td>
+
+                            <td colspan="2">
+                                @if (user.DELETE_RESINSTOCK.Equals(false))
+                                {
+                                    <input id="DELETE_RESINSTOCK" type="checkbox" class="checkbox" ng-model="DELETE_RESINSTOCK" name="DELETE_RESINSTOCK" />
+                                }
+                                else
+                                {
+                                    <input id="DELETE_RESINSTOCK" type="checkbox" class="checkbox" checked ng-model="DELETE_RESINSTOCK" name="DELETE_RESINSTOCK" />
+                                }
+
+                                Xóa Resin Stock
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                @if (user.NHAP_KQSX.Equals(false))
+                                {
+                                    <input id="NHAP_KQSX" type="checkbox" class="checkbox" ng-model="NHAP_KQSX" name="NHAP_KQSX" />
+                                }
+                                else
+                                {
+                                    <input id="NHAP_KQSX" type="checkbox" class="checkbox" checked ng-model="NHAP_KQSX" name="NHAP_KQSX" />
+                                }
+
+                                Nhập Kết Quả Sản Xuất
+                            </td>
+
+                            <td colspan="3">
+                                @if (user.EDIT_KQSX.Equals(false))
+                                {
+                                    <input id="EDIT_KQSX" type="checkbox" class="checkbox" ng-model="EDIT_KQSX" name="EDIT_KQSX" />
+                                }
+                                else
+                                {
+                                    <input id="EDIT_KQSX" type="checkbox" class="checkbox" checked ng-model="EDIT_KQSX" name="EDIT_KQSX" />
+                                }
+
+                                Chỉnh Sửa Kết Quả Sản Xuất (Quyền Admin)
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                @if (user.ADD_CODELIST.Equals(false))
+                                {
+                                    <input id="ADD_CODELIST" type="checkbox" class="checkbox" ng-model="ADD_CODELIST" name="ADD_CODELIST" />
+                                }
+                                else
+                                {
+                                    <input id="ADD_CODELIST" type="checkbox" class="checkbox" checked ng-model="ADD_CODELIST" name="ADD_CODELIST" />
+                                }
+
+                                Thêm Code List
+                            </td>
+
+                            <td colspan="3">
+                                @if (user.EDIT_CODELIST.Equals(false))
+                                {
+                                    <input id="EDIT_CODELIST" type="checkbox" class="checkbox" ng-model="EDIT_CODELIST" name="EDIT_CODELIST" />
+                                }
+                                else
+                                {
+                                    <input id="EDIT_CODELIST" type="checkbox" class="checkbox" checked ng-model="EDIT_CODELIST" name="EDIT_CODELIST" />
+                                }
+
+                                Chỉnh Sửa Code List
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                @if (user.ADD_PICKLISTVATTU.Equals(false))
+                                {
+                                    <input id="ADD_PICKLISTVATTU" type="checkbox" class="checkbox" ng-model="ADD_PICKLISTVATTU" name="ADD_PICKLISTVATTU" />
+                                }
+                                else
+                                {
+                                    <input id="ADD_PICKLISTVATTU" type="checkbox" class="checkbox" checked ng-model="ADD_PICKLISTVATTU" name="ADD_PICKLISTVATTU" />
+                                }
+
+                                Thêm Picklist Vật Tư
+                            </td>
+                            <td colspan="3">
+                                @if (user.EDIT_PICKLISTVATTU.Equals(false))
+                                {
+                                    <input id="EDIT_PICKLISTVATTU" type="checkbox" class="checkbox" ng-model="EDIT_PICKLISTVATTU" name="EDIT_PICKLISTVATTU" />
+                                }
+                                else
+                                {
+                                    <input id="EDIT_PICKLISTVATTU" type="checkbox" class="checkbox" checked ng-model="EDIT_PICKLISTVATTU" name="EDIT_PICKLISTVATTU" />
+                                }
+
+                                Chỉnh Sửa Picklist Vật Tư
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                @if (user.IMPORT_PSI.Equals(false))
+                                {
+                                    <input id="IMPORT_PSI" type="checkbox" class="checkbox" ng-model="IMPORT_PSI" name="IMPORT_PSI" />
+
+                                }
+                                else
+                                {
+                                    <input id="IMPORT_PSI" type="checkbox" class="checkbox" checked ng-model="IMPORT_PSI" name="IMPORT_PSI" />
+
+                                }
+
+                                Import PSI
+                            </td>
+
+                            <td>
+                                @if (user.IMPORT_STOCK.Equals(false))
+                                {
+                                    <input id="IMPORT_STOCK" type="checkbox" class="checkbox" ng-model="IMPORT_STOCK" name="IMPORT_STOCK" />
+
+                                }
+                                else
+                                {
+                                    <input id="IMPORT_STOCK" type="checkbox" class="checkbox" checked ng-model="IMPORT_STOCK" name="IMPORT_STOCK" />
+
+                                }
+
+                                Import Stock
+                            </td>
+
+                            <td colspan="2">
+                                @if (user.IMPORT_RESINSTOCK.Equals(false))
+                                {
+                                    <input id="IMPORT_RESINSTOCK" type="checkbox" class="checkbox" ng-model="IMPORT_RESINSTOCK" name="IMPORT_RESINSTOCK" />
+
+                                }
+                                else
+                                {
+                                    <input id="IMPORT_RESINSTOCK" type="checkbox" class="checkbox" checked ng-model="IMPORT_RESINSTOCK" name="IMPORT_RESINSTOCK" />
+
+                                }
+
+                                Import Resin Stock
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="4" style="font-weight:bold">Quyền Truy Cập</td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Quyền cao nhất:
+                            </td>
+
+                            <td colspan="3">
+                                <select id="GroupID" class="form-control" style="font-weight:bold" ng-model="GroupID" name="GroupID">
+                                    @if (user.GroupID.Equals("ADMIN"))
+                                    {
+                                        <option value="MEMBER">Member</option>
+                                        <option selected value="ADMIN">Admin</option>
+                                    }
+                                    else
+                                    {
+                                        <option selected value="MEMBER">Member</option>
+                                        <option value="ADMIN">Admin</option>
+                                    }
+                                </select>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="4">
+                                <div id="htmlpassword">
+                                    <input id="password" type="password" placeholder="Nhập mật khẩu xác thực" class="form-control" style="text-align:center" ng-model="Password" name="password" />
+                                </div>
+                                <br />
+                                <input type="button" value="Cấp quyền" class="btn btn-success" onclick="EditQuyen('VIEW_USER','LAP_KEHOACH','EDIT_KEHOACH','XUAT_EXCEL','ADD_STOCK','EDIT_STOCK','DELETE_STOCK','ADD_RESINSTOCK','EDIT_RESINSTOCK','DELETE_RESINSTOCK','NHAP_KQSX','EDIT_KQSX','ADD_CODELIST','EDIT_CODELIST','ADD_PICKLISTVATTU','EDIT_PICKLISTVATTU','IMPORT_PSI','IMPORT_STOCK','IMPORT_RESINSTOCK','@user.User1','password','GroupID')" />
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div id="Quản lý đăng nhập" class="tabcontent">
+                    <table class="table table-bordered">
+                        <tr>
+                            <td rowspan="3">
+                                <label class="label label-success">Reset Password: </label>
+                            </td>
+
+                            <td rowspan="3">
+                                <div id="htmlresetpassword">
+                                    <input type="password" class="form-control" id="valuepassword" />
+                                </div>
+                            </td>
+
+                            <th colspan="2">
+                                Khóa tài khoản
+                            </th>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <label class="label label-success">Trạng thái: </label>
+                            </td>
+
+                            <td>
+                                @{
+                                    if (user.Status.Equals(false))
+                                    {
+                                <div id="status">
+                                    <label class="label label-success">Đang hoạt động</label>
+                                </div>
+                                    }
+                                    else
+                                    {
+                                <div id="status">
+                                    <label class="text-danger">Đang bị khóa</label>
+                                </div>
+                                    }
+                                }
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <label class="label label-success">Kích hoạt: </label>
+                            </td>
+
+                            <td style="text-align:left">
+                                <fieldset id="group1">
+                                    <input type="radio" name="group1" id="chuakhoa">
+                                    <span>Mở khóa</span>
+                                    <br />
+                                    <input type="radio" name="group1" id="khoa">
+                                    <span>Khóa</span>
+                                </fieldset>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="4">
+                                <div class="form-row">
+                                    <div class="col-md-12" style="text-align:center" id="htmlpassxacthuc">
+                                        <input id="passxacthuc" type="password" class="form-control" placeholder="Nhập mật khẩu xác thực" style="text-align:center" />
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="2">
+                                <input type="button" class="btn btn-success" value="Reset password" onclick="resetpassword('@user.User1','valuepassword','passxacthuc')" />
+                            </td>
+
+                            <td colspan="2">
+                                <input type="button" class="btn btn-danger" value="Kích hoạt" onclick="blockaccount('@user.User1','passxacthuc','chuakhoa')"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form action="/Account/PhanQuyen" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="modal-header">
+                        Chỉnh sửa
+                    </div>
+                    <div class="modal-body" style="font-weight:bold">
+                        Mr/Ms: <input value="@user.Name" maxlength="30" ng-model="Name" name="name" class="form-control" placeholder="Tên" />
+                        <br />
+                        Họ và tên:
+                        <input value="@user.FullName" maxlength="30" class="form-control" ng-model="FullName" name="fullname" placeholder="Họ và tên" />
+                        <br />
+                        Bộ phận:
+                        <input value="@user.BoPhan" maxlength="30" class="form-control" ng-model="BoPhan" name="bophan" placeholder="Bộ phận" />
+                        <br />
+                        User:
+                        <input value="@user.User1" maxlength="30" class="form-control" ng-model="User1" name="user1" placeholder="User" readonly />
+                        <br />
+                        Email:
+                        <input value="@user.Email" maxlength="30" class="form-control" ng-model="Email" name="Email" placeholder="Email" />
+                        <br />
+                        Số điện thoại:
+                        <input value="@user.NumberPhone" maxlength="30" class="form-control" ng-model="NumberPhone" name="NumberPhone" placeholder="NumberPhone" />
+                    </div>
+                    <div class="modal-footer" style="text-align:center">
+                        <input type="password" class="form-control" placeholder="Nhập mật khẩu xác thực" ng-model="Password" name="password" />
+                        <input hidden value="@user.ID" ng-model="ID" name="id" />
+                        <input type="submit" value="Cập nhật" class="btn btn-success" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+<dialog id="success" style="border:none;border-radius:10px;text-align:center">
+    <h5 class="text-success">Cấp quyền thành công</h5>
+    <br />
+    <input type="button" value="OK" onclick="exitdlog1()" class="btn btn-success" />
+</dialog>
+
+<dialog id="updatesuccess" style="border:none;border-radius:10px;text-align:center">
+    <h5 class="text-success">Mật khẩu đã được khôi phục</h5>
+    <br />
+    <input type="button" value="OK" onclick="exitdlog0()" class="btn btn-success" />
+</dialog>
+
+<dialog id="notfound" style="border:none;border-radius:10px;text-align:center">
+    <h5 class="text-danger">Không tìm thấy tài khoản này!</h5>
+    <br />
+    <input type="button" value="OK" onclick="exitdlog2()" class="btn btn-success" />
+</dialog>
+
+<dialog id="cfmpassword" style="border:none;border-radius:10px;text-align:center">
+    <h5 class="text-danger">Mật khẩu xác thực không đúng!</h5>
+    <br />
+    <input type="button" value="OK" onclick="exitdlog3()" class="btn btn-success" />
+</dialog>
+
+<dialog id="cfmcapquyen" style="border:none;border-radius:10px;text-align:center">
+    <h5 class="text-danger">BẠN CÓ CHẮC MUỐN CẤP QUYỀN CAO NHẤT CHO TÀI KHOẢN NÀY?</h5>
+    <br />
+    <input id="yes" type="button" value="YES" onclick="exitdlog4()" class="btn btn-success" />&nbsp;&nbsp;&nbsp;
+    <input type="button" value="NO" onclick="exitdlog4()" class="btn btn-danger" />
+</dialog>
+
+<dialog id="cfmlength" style="border:none;border-radius:10px;text-align:center">
+    <h5 class="text-danger">Mật khẩu phải ít nhất 6 ký tự và nhiều nhất 32 ký tự!</h5>
+    <br />
+    <input id="yes" type="button" value="OK" onclick="exitdlog5()" class="btn btn-success" />
+</dialog>
+
+<dialog id="unblocked" style="border:none;border-radius:10px;text-align:center">
+    <h5 class="text-success">Tài khoản này đã được mở khóa</h5>
+    <br />
+    <input type="button" value="OK" onclick="exitdlog6()" class="btn btn-success" />
+</dialog>
+
+<dialog id="blocked" style="border:none;border-radius:10px;text-align:center">
+    <h5 class="text-success">Tài khoản này đã được khóa</h5>
+    <br />
+    <input type="button" value="OK" onclick="exitdlog7()" class="btn btn-success" />
+</dialog>
+
+<script>
+    function blockaccount(user,idMatkhauxacthuc, idChuakhoa) {
+        var idmatkhauxacthuc = document.getElementById(idMatkhauxacthuc);
+        var matkhauxacthuc = idmatkhauxacthuc.value;
+
+        var arrItem = "";
+
+        var checkId = document.getElementById(idChuakhoa);
+        var isChecked = $(checkId).is(":checked", true);
+        if (isChecked) {
+            arrItem = "CHUAKHOA";
+        }
+
+        var dlog1 = document.getElementById('blocked');
+        var dlog2 = document.getElementById('notfound');
+        var dlog3 = document.getElementById('cfmpassword');
+        var dlog4 = document.getElementById('cfmlength');
+        var dlog5 = document.getElementById('unblocked');
+
+        $.ajax({
+            url: "/Account/BlockAccount",
+            data: {
+                user: user,
+                matkhauxacthuc: matkhauxacthuc,
+                Itemlist: arrItem
+            },
+            dataType: "json",
+            type: "POST",
+            success: function (flag) {
+                if (flag == 1) {
+                    var html = '<input id="passxacthuc" type="password" class="form-control" placeholder="Nhập mật khẩu xác thực" style="text-align:center" value=""/>'
+                    var htmlid = document.getElementById('htmlpassxacthuc');
+                    $(htmlid).html(html);
+
+                    var html = '<label class="text-danger">Đang bị khóa</label>'
+                    var htmlid = document.getElementById('status');
+                    $(htmlid).html(html);
+
+                    dlog1.showModal();
+                }
+                else if (flag == -1) {
+                    var html = '<input id="passxacthuc" type="password" class="form-control" placeholder="Nhập mật khẩu xác thực" style="text-align:center" value=""/>'
+                    var htmlid = document.getElementById('htmlpassxacthuc');
+                    $(htmlid).html(html);
+
+                    var html = '<label class="label label-success">Đang hoạt động</label>'
+                    var htmlid = document.getElementById('status');
+                    $(htmlid).html(html);
+
+                    dlog5.showModal();
+                }
+                else if (flag == 0) {
+                    dlog3.showModal();
+                }
+                else if (flag == 3) {
+                    dlog4.showModal();
+                }
+                else {
+                    dlog2.showModal();
+                }
+            }
+        })
+    }
+
+    function resetpassword(user, idMatkhau, idMatkhauxacthuc) {
+        var idmatkhau = document.getElementById(idMatkhau);
+        var idmatkhauxacthuc = document.getElementById(idMatkhauxacthuc);
+
+        var matkhau = idmatkhau.value;
+        var matkhauxacthuc = idmatkhauxacthuc.value;
+
+        var dlog1 = document.getElementById('updatesuccess');
+        var dlog2 = document.getElementById('notfound');
+        var dlog3 = document.getElementById('cfmpassword');
+        var dlog4 = document.getElementById('cfmlength');
+
+        $.ajax({
+            url: "/Account/ResetPassword",
+            data: {
+                user: user,
+                matkhaureset: matkhau,
+                matkhauxacthuc: matkhauxacthuc,
+            },
+            dataType: "json",
+            type: "POST",
+            success: function (flag) {
+                if (flag == 1) {
+                    var html = '<input type="password" class="form-control" id="valuepassword" value=""/>'
+                    var htmlid = document.getElementById('htmlresetpassword');
+                    $(htmlid).html(html);
+
+                    var html = '<input id="passxacthuc" type="password" class="form-control" placeholder="Nhập mật khẩu xác thực" style="text-align:center" value=""/>'
+                    var htmlid = document.getElementById('htmlpassxacthuc');
+                    $(htmlid).html(html);
+                    dlog1.showModal();
+                }
+                else if (flag == 0) {
+                    dlog3.showModal();
+                }
+                else if (flag == 3) {
+                    dlog4.showModal();
+                }
+                else {
+                    dlog2.showModal();
+                }
+            }
+        })
+    }
+
+    function EditQuyen(VIEW_USER, LAP_KEHOACH, EDIT_KEHOACH, XUAT_EXCEL, ADD_STOCK, EDIT_STOCK, DELETE_STOCK,
+        ADD_RESINSTOCK, EDIT_RESINSTOCK, DELETE_RESINSTOCK, NHAP_KQSX, EDIT_KQSX, ADD_CODELIST, EDIT_CODELIST,
+        ADD_PICKLISTVATTU, EDIT_PICKLISTVATTU, IMPORT_PSI, IMPORT_STOCK, IMPORT_RESINSTOCK, user, password, GroupID) {
+
+        var arrItem = [];
+
+        var checkId = document.getElementById(VIEW_USER);
+        var isChecked = $(checkId).is(":checked", true);
+        if (isChecked) {
+            arrItem.push(VIEW_USER)
+        }
+
+        var checkId = document.getElementById(LAP_KEHOACH);
+        var isChecked = $(checkId).is(":checked", true);
+        if (isChecked) {
+            arrItem.push(LAP_KEHOACH)
+        }
+
+        var checkId = document.getElementById(EDIT_KEHOACH);
+        var isChecked = $(checkId).is(":checked", true);
+        if (isChecked) {
+            arrItem.push(EDIT_KEHOACH)
+        }
+
+        var checkId = document.getElementById(XUAT_EXCEL);
+        var isChecked = $(checkId).is(":checked", true);
+        if (isChecked) {
+            arrItem.push(XUAT_EXCEL)
+        }
+
+        var checkId = document.getElementById(ADD_STOCK);
+        var isChecked = $(checkId).is(":checked", true);
+        if (isChecked) {
+            arrItem.push(ADD_STOCK)
+        }
+
+        var checkId = document.getElementById(EDIT_STOCK);
+        var isChecked = $(checkId).is(":checked", true);
+        if (isChecked) {
+            arrItem.push(EDIT_STOCK)
+        }
+
+        var checkId = document.getElementById(DELETE_STOCK);
+        var isChecked = $(checkId).is(":checked", true);
+        if (isChecked) {
+            arrItem.push(DELETE_STOCK)
+        }
+
+        var checkId = document.getElementById(ADD_RESINSTOCK);
+        var isChecked = $(checkId).is(":checked", true);
+        if (isChecked) {
+            arrItem.push(ADD_RESINSTOCK)
+        }
+
+        var checkId = document.getElementById(EDIT_RESINSTOCK);
+        var isChecked = $(checkId).is(":checked", true);
+        if (isChecked) {
+            arrItem.push(EDIT_RESINSTOCK)
+        }
+
+        var checkId = document.getElementById(DELETE_RESINSTOCK);
+        var isChecked = $(checkId).is(":checked", true);
+        if (isChecked) {
+            arrItem.push(DELETE_RESINSTOCK)
+        }
+
+        var checkId = document.getElementById(NHAP_KQSX);
+        var isChecked = $(checkId).is(":checked", true);
+        if (isChecked) {
+            arrItem.push(NHAP_KQSX)
+        }
+
+        var checkId = document.getElementById(EDIT_KQSX);
+        var isChecked = $(checkId).is(":checked", true);
+        if (isChecked) {
+            arrItem.push(EDIT_KQSX)
+        }
+
+        var checkId = document.getElementById(ADD_CODELIST);
+        var isChecked = $(checkId).is(":checked", true);
+        if (isChecked) {
+            arrItem.push(ADD_CODELIST)
+        }
+
+        var checkId = document.getElementById(EDIT_CODELIST);
+        var isChecked = $(checkId).is(":checked", true);
+        if (isChecked) {
+            arrItem.push(EDIT_CODELIST)
+        }
+
+        var checkId = document.getElementById(ADD_PICKLISTVATTU);
+        var isChecked = $(checkId).is(":checked", true);
+        if (isChecked) {
+            arrItem.push(ADD_PICKLISTVATTU)
+        }
+
+        var checkId = document.getElementById(EDIT_PICKLISTVATTU);
+        var isChecked = $(checkId).is(":checked", true);
+        if (isChecked) {
+            arrItem.push(EDIT_PICKLISTVATTU)
+        }
+
+        var checkId = document.getElementById(IMPORT_PSI);
+        var isChecked = $(checkId).is(":checked", true);
+        if (isChecked) {
+            arrItem.push(IMPORT_PSI)
+        }
+
+        var checkId = document.getElementById(IMPORT_STOCK);
+        var isChecked = $(checkId).is(":checked", true);
+        if (isChecked) {
+            arrItem.push(IMPORT_STOCK)
+        }
+
+        var checkId = document.getElementById(IMPORT_RESINSTOCK);
+        var isChecked = $(checkId).is(":checked", true);
+        if (isChecked) {
+            arrItem.push(IMPORT_RESINSTOCK)
+        }
+
+        var arrString = arrItem.toString();
+
+        var idpassword = document.getElementById(password);
+        var getpassword = idpassword.value;
+
+        var idGroupID = document.getElementById(GroupID);
+        var getGroupID = idGroupID.value;
+
+        var dlog1 = document.getElementById('success');
+        var dlog2 = document.getElementById('notfound');
+        var dlog3 = document.getElementById('cfmpassword');
+        var dlog4 = document.getElementById('cfmcapquyen');
+
+        var idYes = document.getElementById('yes');
+
+        if (getGroupID == "ADMIN") {
+            dlog4.showModal();
+
+            $(idYes).click(function () {
+                $.ajax({
+                    url: "/Account/EditQuyen",
+                    data: {
+                        user: user,
+                        password: getpassword,
+                        GroupID: getGroupID,
+                        ItemList: arrString
+                    },
+                    dataType: "json",
+                    type: "POST",
+                    success: function (flag) {
+                        if (flag == 1) {
+                            dlog2.showModal();
+                        }
+                        else if (flag == 2) {
+                            dlog3.showModal();
+                        }
+                        else {
+                            var html = '<input id="password" type="password" placeholder="Nhập mật khẩu xác thực" class="form-control" style="text-align:center" ng-model="Password" name="password" value=""/>'
+                            var htmlid = document.getElementById('htmlpassword');
+                            $(htmlid).html(html);
+                            dlog1.showModal();
+                        }
+
+                    }
+                })
+            })
+        }
+        else {
+            $.ajax({
+                url: "/Account/EditQuyen",
+                data: {
+                    user: user,
+                    password: getpassword,
+                    GroupID: getGroupID,
+                    ItemList: arrString
+                },
+                dataType: "json",
+                type: "POST",
+                success: function (flag) {
+                    if (flag == 1) {
+                        dlog2.showModal();
+                    }
+                    else if (flag == 2) {
+                        dlog3.showModal();
+                    }
+                    else {
+                        var html = '<input id="password" type="password" placeholder="Nhập mật khẩu xác thực" class="form-control" style="text-align:center" ng-model="Password" name="password" value=""/>'
+                        var htmlid = document.getElementById('htmlpassword');
+                        $(htmlid).html(html);
+                        dlog1.showModal();
+                    }
+
+                }
+            })
+        }
+    }
+
+    function exitdlog1() {
+        var dlog = document.getElementById('success');
+        dlog.close();
+    }
+
+    function exitdlog2() {
+        var dlog = document.getElementById('notfound');
+        dlog.close();
+    }
+
+    function exitdlog3() {
+        var dlog = document.getElementById('cfmpassword');
+        dlog.close();
+    }
+
+    function exitdlog4() {
+        var dlog = document.getElementById('cfmcapquyen');
+        dlog.close();
+    }
+
+    function exitdlog5() {
+        var dlog = document.getElementById('cfmlength');
+        dlog.close();
+    }
+
+    function exitdlog0() {
+        var dlog = document.getElementById('updatesuccess');
+        dlog.close();
+    }
+
+    function exitdlog6() {
+        var dlog = document.getElementById('unblocked');
+        dlog.close();
+    }
+
+    function exitdlog7() {
+        var dlog = document.getElementById('blocked');
+        dlog.close();
+    }
+
+    var buttons = document.getElementsByClassName('tablinks');
+    var contents = document.getElementsByClassName('tabcontent');
+    function showContent(id) {
+
+        for (var i = 0; i < contents.length; i++) {
+            contents[i].style.display = 'none';
+        }
+        var content = document.getElementById(id);
+        content.style.display = 'block';
+    }
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener("click", function () {
+            var id = this.textContent;
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove("active");
+            }
+            this.className += " active";
+            showContent(id);
+        });
+    }
+    showContent('Thông tin tài khoản');
+</script>

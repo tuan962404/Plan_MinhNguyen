@@ -1,0 +1,105 @@
+﻿@model PicklistVatTu
+@{
+    ViewBag.Title = "Edit_VatTu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    var c = (PicklistVatTu)ViewBag.VatTu;
+}
+<style>
+    .edit {
+        border-radius: 5px;
+        height: 40px;
+        border: 1px solid #ced4da;
+        width: 150px;
+        text-align: center;
+        outline: none
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    @*<ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="#">Dashboard</a>
+            </li>
+            <li class="breadcrumb-item active">Tables</li>
+        </ol>*@
+    <!-- DataTables Example -->
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-table"></i>
+            Cập nhật vật tư
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                @using (Html.BeginForm("Edit_VatTu", "Home", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <hr />
+                    @Html.ValidationSummary("", new { @class = "text-danger" })
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Machine No.</th>
+                                <th>Machine</th>
+                                <th>Cycle Time</th>
+                                <th>Cavity</th>
+                                <th>Manpower</th>
+                                <th>Resin</th>
+                                <th>Resin Code</th>
+                                <th>Weight</th>
+                                <th>Vật tư code </th>
+                                <th>Tên vật tư</th>
+                                <th>Tỷ lệ</th>
+                                <th>Another Code</th>
+                                <th>Chỉnh sửa</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Code</th>
+                                <th>Machine No.</th>
+                                <th>Machine</th>
+                                <th>Cycle Time</th>
+                                <th>Cavity</th>
+                                <th>Manpower</th>
+                                <th>Resin</th>
+                                <th>Resin Code</th>
+                                <th>Weight</th>
+                                <th>Vật tư code </th>
+                                <th>Tên vật tư</th>
+                                <th>Tỷ lệ</th>
+                                <th>Another Code</th>
+                                <th>Chỉnh sửa</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                            <tr>
+                                <td>@Html.TextBoxFor(m => m.Injection_Code, new { @class = "edit", @readonly = "readonly", @Value = c.Injection_Code })</td>
+                                <td>@Html.TextBoxFor(m => m.Machine_No_, new { @class = "edit", @Value = c.Machine_No_ })</td>
+                                <td>@Html.TextBoxFor(m => m.Machine, new { @class = "edit", @Value = c.Machine })</td>
+                                <td>@Html.TextBoxFor(m => m.Cycle_Time, new { @class = "edit", @Value = c.Cycle_Time })</td>
+                                <td>@Html.TextBoxFor(m => m.Cavity, new { @class = "edit", @Value = c.Cavity })</td>
+                                <td>@Html.TextBoxFor(m => m.Manpower, new { @class = "edit", @Value = c.Manpower })</td>
+                                <td>@Html.TextBoxFor(m => m.Resin, new { @class = "edit", @Value = c.Resin })</td>
+                                <td>@Html.TextBoxFor(m => m.Resin_Code, new { @class = "edit", @Value = c.Resin_Code })</td>
+                                <td>@Html.TextBoxFor(m => m.Weight, new { @class = "edit", @Value = c.Weight })</td>
+                                <td>@Html.TextBoxFor(m => m.Vat_Tu_Code, new { @class = "edit", @Value = c.Vat_Tu_Code })</td>
+                                <td>@Html.TextBoxFor(m => m.Ten_Vat_Tu, new { @class = "edit", @Value = c.Ten_Vat_Tu })</td>
+                                <td>@Html.TextBoxFor(m => m.Ty_Le, new { @class = "edit", @Value = c.Ty_Le })</td>
+                                <td>@Html.TextBoxFor(m => m.Another_Code, new { @class = "edit", @Value = c.Another_Code })</td>
+                                <td><input type="submit" class="btn btn-outline-danger" value="Nhập" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                }
+            </div>
+            <div class="card-footer small text-muted"></div>
+        </div>
+    </div>
+
+
+

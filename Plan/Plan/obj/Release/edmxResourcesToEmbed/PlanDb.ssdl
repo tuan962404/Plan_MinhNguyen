@@ -1,0 +1,322 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="PlanModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="Assy_PSI_Shortage">
+    <Key>
+      <PropertyRef Name="STT" />
+    </Key>
+    <Property Name="STT" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Code" Type="nvarchar" MaxLength="200" />
+    <Property Name="Date" Type="date" />
+    <Property Name="Requirement" Type="int" />
+  </EntityType>
+  <EntityType Name="CodeList">
+    <Key>
+      <PropertyRef Name="No." />
+    </Key>
+    <Property Name="No." Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Injection-Code" Type="nvarchar" MaxLength="200" Nullable="false" />
+    <Property Name="Machine-No." Type="nvarchar" MaxLength="200" />
+    <Property Name="Machine" Type="nvarchar" MaxLength="200" />
+    <Property Name="Cycle-Time" Type="nvarchar" MaxLength="200" />
+    <Property Name="Cavity" Type="nvarchar" MaxLength="200" />
+    <Property Name="Manpower" Type="nvarchar" MaxLength="200" />
+    <Property Name="Resin" Type="nvarchar" MaxLength="200" />
+    <Property Name="Resin-Code" Type="nvarchar" MaxLength="200" />
+    <Property Name="Weight" Type="nvarchar" MaxLength="200" />
+    <Property Name="Another Code" Type="nvarchar" MaxLength="200" />
+    <Property Name="ItemName" Type="nvarchar" MaxLength="200" />
+  </EntityType>
+  <EntityType Name="Credential">
+    <Key>
+      <PropertyRef Name="UserGroupID" />
+      <PropertyRef Name="RoleID" />
+    </Key>
+    <Property Name="UserGroupID" Type="varchar" MaxLength="20" Nullable="false" />
+    <Property Name="RoleID" Type="varchar" MaxLength="50" Nullable="false" />
+  </EntityType>
+  <EntityType Name="DA_Injection">
+    <Key>
+      <PropertyRef Name="No." />
+    </Key>
+    <Property Name="No." Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Code" Type="nvarchar" MaxLength="200" />
+    <Property Name="So-May" Type="int" />
+    <Property Name="Trong-Luong-May" Type="nvarchar" MaxLength="200" />
+    <Property Name="%Good" Type="float" />
+    <Property Name="Ke-Hoach" Type="int" />
+    <Property Name="Ke-Hoach-Bo-Sung" Type="int" />
+    <Property Name="Manpower" Type="float" />
+    <Property Name="Stock" Type="int" />
+    <Property Name="Cycle-time" Type="float" />
+    <Property Name="Cavity" Type="int" />
+    <Property Name="Capa" Type="float" />
+    <Property Name="Balance-Plan" Type="int" />
+    <Property Name="Date" Type="date" />
+    <Property Name="Requirements" Type="int" />
+    <Property Name="Plan-Time(D)" Type="float" />
+    <Property Name="Plan(D)" Type="int" />
+    <Property Name="Good(D)" Type="int" />
+    <Property Name="NG(D)" Type="int" />
+    <Property Name="%NG" Type="float" />
+    <Property Name="[Plan-Time(N)" Type="float" />
+    <Property Name="Plan(N)" Type="int" />
+    <Property Name="Good(N)" Type="int" />
+    <Property Name="NG(N)" Type="int" />
+    <Property Name="Date_End" Type="date" />
+    <Property Name="Week" Type="nvarchar" MaxLength="200" />
+    <Property Name="ID_PlanTimeDem" Type="nvarchar" MaxLength="200" />
+    <Property Name="ID_PlanTimeNgay" Type="nvarchar" MaxLength="200" />
+    <Property Name="PSI" Type="nvarchar" MaxLength="200" />
+    <Property Name="Statuss" Type="nvarchar" MaxLength="200" />
+    <Property Name="plandemtemp" Type="int" />
+    <Property Name="plantimedemtemp" Type="float" />
+    <Property Name="planngaytemp" Type="int" />
+    <Property Name="plantimengaytemp" Type="float" />
+    <Property Name="ID_PlanDem" Type="nvarchar" MaxLength="50" />
+    <Property Name="ID_PlanNgay" Type="nvarchar" MaxLength="50" />
+    <Property Name="Html_PlanTimeDem" Type="nvarchar" MaxLength="50" />
+    <Property Name="Html_PlanTimeNgay" Type="nvarchar" MaxLength="50" />
+    <Property Name="FlagDem" Type="bit" />
+    <Property Name="FlagNgay" Type="bit" />
+    <Property Name="ID_ValidateDem" Type="nvarchar" MaxLength="50" />
+    <Property Name="ID_ValidateNgay" Type="nvarchar" MaxLength="50" />
+    <Property Name="ID_Balance" Type="nvarchar" MaxLength="50" />
+    <Property Name="ID_KHBS" Type="nvarchar" MaxLength="50" />
+    <Property Name="Html_SoMay" Type="nvarchar" MaxLength="50" />
+    <Property Name="STT" Type="int" />
+    <Property Name="ItemName" Type="nvarchar" MaxLength="200" />
+  </EntityType>
+  <EntityType Name="Domain">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Domain" Type="nvarchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="KetQuaSanXuatThieu">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Code" Type="nvarchar" MaxLength="50" />
+    <Property Name="Date" Type="date" />
+    <Property Name="SoThieuCaDem" Type="int" />
+    <Property Name="SoThieuCaNgay" Type="int" />
+    <Property Name="SoMay" Type="int" />
+    <Property Name="Week" Type="nvarchar" MaxLength="50" />
+    <Property Name="PSI" Type="nvarchar" MaxLength="50" />
+    <Property Name="FlagDem" Type="bit" />
+    <Property Name="FlagNgay" Type="bit" />
+  </EntityType>
+  <EntityType Name="MailServer">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Email" Type="nvarchar" MaxLength="50" />
+    <Property Name="Password" Type="nvarchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="MailVerify">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="UserName" Type="nvarchar" MaxLength="50" />
+    <Property Name="Email" Type="nvarchar" MaxLength="50" />
+    <Property Name="CodeVerify" Type="nvarchar" MaxLength="50" />
+    <Property Name="Status" Type="bit" />
+  </EntityType>
+  <EntityType Name="PicklistVatTu">
+    <Key>
+      <PropertyRef Name="STT" />
+    </Key>
+    <Property Name="STT" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Injection_Code" Type="nvarchar" MaxLength="200" />
+    <Property Name="Machine_No." Type="nvarchar" MaxLength="200" />
+    <Property Name="Machine" Type="nvarchar" MaxLength="200" />
+    <Property Name="Cycle_Time" Type="nvarchar" MaxLength="200" />
+    <Property Name="Cavity" Type="nvarchar" MaxLength="200" />
+    <Property Name="Manpower" Type="nvarchar" MaxLength="200" />
+    <Property Name="Resin" Type="nvarchar" MaxLength="200" />
+    <Property Name="Resin Code" Type="nvarchar" MaxLength="200" />
+    <Property Name="Weight" Type="nvarchar" MaxLength="200" />
+    <Property Name="Vat_Tu_Code" Type="nvarchar" MaxLength="200" />
+    <Property Name="Ten_Vat_Tu" Type="nvarchar" MaxLength="200" />
+    <Property Name="Ty_Le" Type="nvarchar" MaxLength="200" />
+    <Property Name="Another_Code" Type="nvarchar" MaxLength="200" />
+  </EntityType>
+  <EntityType Name="Plan_Week">
+    <Key>
+      <PropertyRef Name="STT" />
+    </Key>
+    <Property Name="STT" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="DateStart" Type="date" />
+    <Property Name="DateEnd" Type="date" />
+    <Property Name="Week" Type="nvarchar" MaxLength="200" />
+  </EntityType>
+  <EntityType Name="Production-Result">
+    <Key>
+      <PropertyRef Name="STT" />
+    </Key>
+    <Property Name="Code" Type="nvarchar" MaxLength="200" Nullable="false" />
+    <Property Name="Date" Type="date" />
+    <Property Name="Shift1(G)" Type="int" />
+    <Property Name="Shift2(G)" Type="int" />
+    <Property Name="Shift1(NG)" Type="int" />
+    <Property Name="Shift2(NG)" Type="int" />
+    <Property Name="STT" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+  </EntityType>
+  <EntityType Name="PSI_V_C">
+    <Key>
+      <PropertyRef Name="STT" />
+    </Key>
+    <Property Name="STT" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Code" Type="nvarchar" MaxLength="200" />
+    <Property Name="Description" Type="nvarchar" MaxLength="200" />
+    <Property Name="Date" Type="date" />
+    <Property Name="Requirement" Type="int" />
+  </EntityType>
+  <EntityType Name="PSI-WM-REF">
+    <Key>
+      <PropertyRef Name="STT" />
+    </Key>
+    <Property Name="Code" Type="nvarchar" MaxLength="200" Nullable="false" />
+    <Property Name="Description" Type="nvarchar" MaxLength="200" />
+    <Property Name="Date" Type="date" />
+    <Property Name="Requirements" Type="int" />
+    <Property Name="STT" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Balace_Stock_" Type="int" />
+  </EntityType>
+  <EntityType Name="ResinStock">
+    <Key>
+      <PropertyRef Name="STT" />
+    </Key>
+    <Property Name="STT" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Code" Type="nvarchar" MaxLength="200" Nullable="false" />
+    <Property Name="ResinStock" Type="int" />
+  </EntityType>
+  <EntityType Name="Role">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="varchar" MaxLength="50" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="Stock">
+    <Key>
+      <PropertyRef Name="STT" />
+    </Key>
+    <Property Name="Code" Type="nvarchar" MaxLength="200" Nullable="false" />
+    <Property Name="Stock" Type="int" />
+    <Property Name="STT" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+  </EntityType>
+  <EntityType Name="SummaryByProduct">
+    <Key>
+      <PropertyRef Name="STT" />
+    </Key>
+    <Property Name="STT" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Code" Type="nvarchar" MaxLength="50" />
+    <Property Name="Date" Type="date" />
+    <Property Name="SoLuong" Type="int" />
+    <Property Name="Mc" Type="int" />
+    <Property Name="ResinCode" Type="nvarchar" MaxLength="50" />
+    <Property Name="Resin" Type="nvarchar" MaxLength="50" />
+    <Property Name="MixRate" Type="float" />
+    <Property Name="NetWeight" Type="float" />
+    <Property Name="Week" Type="nvarchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="User">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="User" Type="varchar" MaxLength="50" />
+    <Property Name="Password" Type="varchar" MaxLength="50" />
+    <Property Name="Name" Type="nvarchar" MaxLength="50" />
+    <Property Name="FullName" Type="nvarchar" MaxLength="50" />
+    <Property Name="BoPhan" Type="nvarchar" MaxLength="50" />
+    <Property Name="NumberPhone" Type="int" />
+    <Property Name="Email" Type="nvarchar" MaxLength="50" />
+    <Property Name="Status" Type="bit" />
+    <Property Name="GroupID" Type="varchar" MaxLength="20" />
+    <Property Name="VIEW_USER" Type="bit" />
+    <Property Name="LAP_KEHOACH" Type="bit" />
+    <Property Name="EDIT_KEHOACH" Type="bit" />
+    <Property Name="XUAT_EXCEL" Type="bit" />
+    <Property Name="ADD_STOCK" Type="bit" />
+    <Property Name="DELETE_STOCK" Type="bit" />
+    <Property Name="ADD_RESINSTOCK" Type="bit" />
+    <Property Name="DELETE_RESINSTOCK" Type="bit" />
+    <Property Name="EDIT_STOCK" Type="bit" />
+    <Property Name="EDIT_RESINSTOCK" Type="bit" />
+    <Property Name="EDIT_KQSX" Type="bit" />
+    <Property Name="NHAP_KQSX" Type="bit" />
+    <Property Name="ADD_CODELIST" Type="bit" />
+    <Property Name="ADD_PICKLISTVATTU" Type="bit" />
+    <Property Name="IMPORT_PSI" Type="bit" />
+    <Property Name="IMPORT_STOCK" Type="bit" />
+    <Property Name="IMPORT_RESINSTOCK" Type="bit" />
+    <Property Name="EDIT_CODELIST" Type="bit" />
+    <Property Name="EDIT_PICKLISTVATTU" Type="bit" />
+  </EntityType>
+  <EntityType Name="UserGroup">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="varchar" MaxLength="20" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" MaxLength="50" />
+  </EntityType>
+  <Function Name="Delete_ResinStock" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+  <Function Name="Delete_Stock" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+  <Function Name="GetViewPlan" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="week" Type="nvarchar" Mode="In" />
+    <Parameter Name="status" Type="nvarchar" Mode="In" />
+  </Function>
+  <Function Name="Sum_PLD_DA" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="code_assy" Type="nvarchar" Mode="In" />
+    <Parameter Name="week" Type="nvarchar" Mode="In" />
+  </Function>
+  <Function Name="Sum_PLN_DA" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="code_assy" Type="nvarchar" Mode="In" />
+    <Parameter Name="week" Type="nvarchar" Mode="In" />
+  </Function>
+  <Function Name="Sum_Require_Assy" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="code_assy" Type="nvarchar" Mode="In" />
+    <Parameter Name="dateStart" Type="date" Mode="In" />
+    <Parameter Name="dateEnd" Type="date" Mode="In" />
+  </Function>
+  <Function Name="Sum_Require_Ref" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="code_assy" Type="nvarchar" Mode="In" />
+    <Parameter Name="dateStart" Type="date" Mode="In" />
+    <Parameter Name="dateEnd" Type="date" Mode="In" />
+  </Function>
+  <Function Name="Sum_Require_VC" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="code_assy" Type="nvarchar" Mode="In" />
+    <Parameter Name="dateStart" Type="date" Mode="In" />
+    <Parameter Name="dateEnd" Type="date" Mode="In" />
+  </Function>
+  <Function Name="SumAssy" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="code" Type="nvarchar" Mode="In" />
+  </Function>
+  <EntityContainer Name="PlanModelStoreContainer">
+    <EntitySet Name="Assy_PSI_Shortage" EntityType="Self.Assy_PSI_Shortage" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="CodeList" EntityType="Self.CodeList" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Credential" EntityType="Self.Credential" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="DA_Injection" EntityType="Self.DA_Injection" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Domain" EntityType="Self.Domain" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="KetQuaSanXuatThieu" EntityType="Self.KetQuaSanXuatThieu" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="MailServer" EntityType="Self.MailServer" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="MailVerify" EntityType="Self.MailVerify" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="PicklistVatTu" EntityType="Self.PicklistVatTu" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Plan_Week" EntityType="Self.Plan_Week" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Production-Result" EntityType="Self.Production-Result" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="PSI_V_C" EntityType="Self.PSI_V_C" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="PSI-WM-REF" EntityType="Self.PSI-WM-REF" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="ResinStock" EntityType="Self.ResinStock" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Role" EntityType="Self.Role" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Stock" EntityType="Self.Stock" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="SummaryByProduct" EntityType="Self.SummaryByProduct" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="UserGroup" EntityType="Self.UserGroup" Schema="dbo" store:Type="Tables" />
+  </EntityContainer>
+</Schema>

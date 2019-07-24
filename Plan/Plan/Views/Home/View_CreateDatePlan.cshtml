@@ -1,0 +1,1302 @@
+﻿@model DA_Injection
+@{
+    ViewBag.Title = "View_CreateDatePlan";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+<style>
+    /*.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+        background-color: aliceblue;
+    }*/
+
+    .edit {
+        border-radius: 5px;
+        height: 40px;
+        border: 1px solid #ced4da;
+        width: 100px;
+        text-align: center;
+        outline: none
+    }
+
+    #Table {
+        overflow-y: auto;
+        height: 550px;
+    }
+
+        #Table th {
+            position: sticky;
+            top: 0;
+        }
+
+    /* Just common table stuff. Really. */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        padding: 8px 16px;
+    }
+
+    th {
+        background: lightblue;
+    }
+</style>
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <form action="/Home/View_CreateDatePlan" method="post">
+            @Html.AntiForgeryToken()
+            <h3 style="color:red">Chọn Ngày Lập</h3>
+            @if (ViewBag.DateStart != null && ViewBag.DateEnd != null && ViewBag.Error == null && ViewBag.ErrorWeek == null)
+            {
+                <h5>Từ Ngày:</h5> <input type="date" ng-model="Date" name="date" required class="form-control" value="@ViewBag.DateStart" disabled />
+                <h5>Đến Ngày:</h5> <input type="date" ng-model="Date_End" name="date_end" required class="form-control" value="@ViewBag.DateEnd" disabled />
+            }
+            else
+            {
+                <h5>Từ Ngày:</h5> <input type="date" ng-model="Date" name="date" required class="form-control" />
+                <h5>Đến Ngày:</h5> <input type="date" ng-model="Date_End" name="date_end" required class="form-control" />
+            }
+
+            @if (ViewBag.Week == null || ViewBag.Error != null || ViewBag.ErrorWeek != null)
+            {
+                <h5>Tuần:</h5> <input type="text" ng-model="Week" name="Week" required class="form-control" value="Week" maxlength="16" />
+            }
+            else
+            {
+                <h5>Tuần:</h5> <input type="text" ng-model="Week" name="Week" required class="form-control" value="@ViewBag.Week" maxlength="16" disabled />
+            }
+
+            <br />
+            @if (ViewBag.DateStart == null || ViewBag.DateEnd == null || ViewBag.Week == null || ViewBag.Error != null || ViewBag.ErrorWeek != null)
+            {
+                <input type="submit" class="btn btn-danger" value="OK" />
+            }
+            else
+            {
+                <input hidden type="submit" class="btn btn-danger" value="OK" />
+            }
+
+            @if (ViewBag.Error != null)
+            {
+                <span style="color:red">@ViewBag.Error</span>
+            }
+
+            @if (ViewBag.ErrorWeek != null)
+            {
+                <br /><span style="color:red">Tên "@ViewBag.ErrorWeek" đã tồn tại! <br />Vui lòng đặt tên khác!</span>
+            }
+        </form>
+    </ol>
+    <!-- DataTables Example -->
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-table"></i>
+            Plan
+            <div style="float:right"><input id="myInput" type="text" placeholder="  Search.." onkeyup="Tim()" style="border-radius:5px;height:35px;border-color:darkgrey;box-shadow: 0 0 0 1pt lightblue;outline:none"></div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive" id="Table">
+
+                <table class="table table-hover" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Ngày</th>
+                            @*<td>Good/Plan(%)</td>*@
+                            <th>Mã Hàng/Code</th>
+                            <th>Item Name</th>
+                            <th>Số Máy</th>
+                            <th>MÁY</th>
+                            <th>Kế Hoạch/Plan</th>
+                            <th>KẾ HOẠCH/BỔ SUNG</th>
+                            <th>Manpower</th>
+                            <th>Stock </th>
+                            <th>Cycle time</th>
+                            <th>Cavity</th>
+                            <th>Capa/Sheep(12)</th>
+                            <th>Ngày</th>
+                            <th>Requirements</th>
+                            <th>Plan Time(D)</th>
+                            <th>Plan(D)</th>
+                            <th>Plan Time(N)</th>
+                            <th>Plan(N)</th>
+                            @*<td>Balance Plan</td>*@
+                            <th>Good<br />Shift1</th>
+                            <th>Good<br />Shift3</th>
+                            <th>NG<br />Shift1</th>
+                            <th>NG<br />Shift3</th>
+                            <th>Mã Hàng/Code</th>
+                            <th>Ngày</th>
+                        </tr>
+                        </thead>
+                        <tbody id="myTable" class="table table-bordered">
+                            @if (ViewBag.Error == null && ViewBag.ErrorWeek == null)
+                            {
+                                if (ViewBag.List != null)
+                                {
+                                    PlanEntities db = new PlanEntities();
+                                    int kehoach = 0;
+                                    int Id_So = 0;
+                                    int Id_balance_so = 0;
+                                    DateTime ngay = DateTime.Now;
+                                    string temp = "false";
+                                    int somay = 0;
+                                    string trongluongmay = "";
+                                    double capatemp = 0;
+                                    int balance = 0;
+                                    string strId_Balance = "Id_Balance";
+                                    var tong_require = 0;
+                                    var tong_stock = 0;
+
+                                    foreach (DA_Injection u in ViewBag.List)
+                                    {
+                                        DA_Injection DA = new DA_Injection();
+
+                                        string code_assy = u.Code;
+                                        string psi = u.PSI;
+                                        DateTime date_assy = Convert.ToDateTime(u.Date);
+                                        var kq = db.CodeLists.Where(x => x.Injection_Code == code_assy || x.Another_Code == code_assy).FirstOrDefault();
+                                        var stock = db.Stocks.Where(i => i.Code == code_assy).FirstOrDefault();
+                                        var product = db.Production_Result.Where(m => m.Date == date_assy && m.Code == code_assy).FirstOrDefault();
+                                        double cycle;
+                                        int cavity;
+                                        if (kq != null)
+                                        {
+                                            string cyle_temp1 = kq.Cycle_Time;
+                                            cyle_temp1 = cyle_temp1.Replace(".",",");
+                                            cycle = Convert.ToDouble(cyle_temp1);
+                                            cavity = Convert.ToInt32(kq.Cavity);
+                                            double capa;
+                                            capa = 3600 / cycle * cavity;
+                                            capa = Math.Round(capa, 1);
+
+                                            DateTime dateStart = Convert.ToDateTime(ViewBag.DateStart);
+                                            DateTime dateEnd = Convert.ToDateTime(ViewBag.DateEnd);
+                                            var datestart = String.Format("{0:yyyy-MM-dd}", dateStart);
+                                            var dateend = String.Format("{0:yyyy-MM-dd}", dateEnd);
+                                            int sum = 0;
+
+                                            foreach(DA_Injection i in ViewBag.List)
+                                            {
+                                                if(i.Code == u.Code)
+                                                {
+                                                    sum += (int)i.Requirements;
+                                                }
+                                            }
+
+                                            int stock_int;
+                                            if (stock != null)
+                                            {
+                                                stock_int = Convert.ToInt32(stock.Stock1);
+                                            }
+                                            else
+                                            {
+                                                stock_int = 0;
+                                            }
+                                            kehoach = sum - stock_int;
+
+                                            if (temp != code_assy)
+                                            {
+                                                if (temp != "false")
+                                                {
+                                                    <tr style="background-color:lightsalmon">
+                                                        <td style="border:none"><div hidden>@temp</div></td>
+                                                        <td style="border:none"><div hidden>@somay</div></td>
+                                                        <td style="border:none"><div hidden>@trongluongmay</div></td>
+                                                        <td style="border:none"><div hidden>@capatemp</div></td>
+                                                        <td colspan="9" style="border-left:none"></td>
+                                                        <td style="text-align:center">
+                                                            Total Requirements:
+                                                            <br />
+                                                            @tong_require
+                                                            @{
+                                                                tong_require = 0;
+                                                            }
+                                                        </td>
+                                                        <td style="text-align:center" colspan="4">
+                                                            Balance Plan:
+                                                            <div id="@strId_Balance">@balance</div>
+                                                        </td>
+                                                        <td colspan="2" style="text-align:center">Total Good</td>
+                                                        <td colspan="2" style="text-align:center">Total Not Good</td>
+                                                        <td colspan="2"></td>
+                                                       
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="24"></td>
+                                                    </tr>
+                                                    Id_balance_so++;
+                                                }
+                                            }
+
+                                            Id_So++;
+
+                                            string Id_PlanTimeDem = "PLD" + Convert.ToString(Id_So); ;
+                                            string Id_PlanTimeNgay = "PLN" + Convert.ToString(Id_So);
+                                            string Id_PlanDem = "PD" + Convert.ToString(Id_So);
+                                            string Id_PlanNgay = "PN" + Convert.ToString(Id_So);
+                                            string Id_Validate = "ValidateD" + Convert.ToString(Id_So);
+                                            string Id_Validate1 = "ValidateN" + Convert.ToString(Id_So);
+                                            string Html_PlanTimeDem = "Html_PlanTimeDem" + Convert.ToString(Id_So);
+                                            string Html_PlanTimeNgay = "Html_PlanTimeNgay" + Convert.ToString(Id_So);
+                                            string Html_SoMay = "Html_SoMay" + Convert.ToString(Id_So);
+                                            <tr style="text-align:center">
+                                                @{
+                                                    DateTime shortDate = Convert.ToDateTime(u.Date);
+                                                    string strDate = shortDate.ToShortDateString();
+                                                }
+                                                <td>
+                                                    @strDate
+                                                    @{
+                                                        DA.Date = u.Date;
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @u.Code
+                                                    @{
+                                                        DA.Code = u.Code;
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @kq.ItemName
+                                                    @{
+                                                        DA.ItemName = kq.ItemName;
+                                                    }
+                                                </td>
+                                                <td id="@Html_SoMay">
+                                                    @kq.Machine_No_
+                                                    @{
+                                                        int strMachine_No_ = Convert.ToInt32(kq.Machine_No_);
+                                                        DA.So_May = strMachine_No_;
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @kq.Machine
+                                                    @{
+                                                        DA.Trong_Luong_May = kq.Machine;
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @kehoach
+                                                    @{
+                                                        DA.Ke_Hoach = kehoach;
+                                                    }
+                                                </td>
+                                                <td style="text-align:center">
+                                                    @{
+                                                        string Id_KHBS = "Id_KHBS" + Convert.ToString(Id_So);
+
+                                                        if (temp != code_assy)
+                                                        {
+                                                            string strdatekhbs = String.Format("{0:yyyy-MM-dd}", u.Date);
+                                                            strId_Balance = "Id_Balance" + Convert.ToString(Id_balance_so);
+                                                            <input type="text" class="edit" value="0" id="@Id_KHBS" onchange="ChangeKHBS('@ViewBag.Week','@code_assy','@strdatekhbs','@Id_KHBS','@psi')" />
+                                                        }
+                                                        else
+                                                        {
+                                                            <div id="@Id_KHBS" style="text-align:center;font-weight:bold">
+
+                                                            </div>
+                                                        }
+                                                        DA.Ke_Hoach_Bo_Sung = 0;
+                                                    }
+
+                                                </td>
+                                                <td>
+                                                    @kq.Manpower
+                                                    @{
+                                                        DA.Manpower = Convert.ToDouble(kq.Manpower);
+                                                    }
+                                                </td>
+
+                                                @if (stock != null)
+                                                {
+                                                    if (temp != u.Code)
+                                                    {
+                                                        tong_stock = 0;
+                                                        tong_stock = (int)stock.Stock1;
+                                                    }
+                                                    string strstock = String.Format("{0:n0}", tong_stock);
+                                                    <td>
+                                                        @if(tong_stock < 0)
+                                                        {
+                                                            <span style="color:red">@strstock</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            @strstock
+                                                        }
+                                                        
+                                                        @{
+                                                            DA.Stock = stock.Stock1;
+                                                            tong_stock = tong_stock - (int)u.Requirements;
+                                                        }
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    <td></td>
+                                                }
+
+                                                <td>
+                                                    @kq.Cycle_Time
+                                                    @{
+                                                        string cycle_temp = kq.Cycle_Time;
+                                                        cycle_temp = cycle_temp.Replace(".",",");
+                                                        DA.Cycle_time = Convert.ToDouble(cycle_temp);
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @kq.Cavity
+                                                    @{
+                                                        DA.Cavity = Convert.ToInt32(kq.Cavity);
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    @capa
+                                                    @{
+                                                        DA.Capa = Convert.ToDouble(capa);
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @strDate
+                                                </td>
+
+                                                <td style="background-color:darksalmon; font-weight:bold;text-align:center">
+                                                    @u.Requirements
+                                                    @{
+                                                        tong_require += (int)u.Requirements;
+                                                        DA.Requirements = u.Requirements;
+                                                        var strdate = String.Format("{0:yyyy-MM-dd}", u.Date);
+                                                    }
+                                                </td>
+
+                                                @if (temp != code_assy)
+                                                {
+                                                    strId_Balance = "Id_Balance" + Convert.ToString(Id_balance_so);
+
+                                                    if (u.Date == dateStart)
+                                                    {
+                                                        <td style="background-color:sandybrown; font-weight:bold;text-align:center">
+
+                                                            <div id="@Html_PlanTimeDem">
+                                                                <input id="@Id_PlanTimeDem" type="text" onchange="TextChange('@kq.Machine_No_','@Html_PlanTimeNgay','@Html_PlanTimeDem','@Id_PlanDem','@Id_PlanNgay','@Id_PlanTimeNgay','@Id_PlanTimeDem','@datestart','@dateend','@kq.Cavity','@kq.Cycle_Time','@stock.Stock1','@kq.Manpower','@kq.Machine','@kq.Machine_No_','@psi','@ViewBag.Week','@Id_Validate','@kehoach','@Id_KHBS','@strId_Balance','@strdate','@Id_PlanTimeDem','@Id_PlanDem','@code_assy')" class="edit" />
+                                                                <br />
+                                                                <span style="font-weight:bold">Start</span>
+                                                            </div>
+                                                            @if (kehoach == 0)
+                                                            {
+                                                                <span style="color:red">Code này không có kế hoạch!</span>
+                                                            }
+
+                                                            @if (kehoach < 0)
+                                                            {
+                                                                var sodu = kehoach * -1;
+                                                                <span style="color:red">Code này còn dư:</span>
+                                                                <br />
+                                                                <span style="color:aqua">@sodu</span>
+                                                            }
+                                                            <span id="@Id_Validate" style="color:red;"></span>
+                                                        </td>
+
+                                                        <td style="background-color:sandybrown; font-weight:bold;text-align:center">
+                                                            <div id="@Id_PlanDem">
+                                                            </div>
+                                                        </td>
+
+                                                        <td style="background-color:sandybrown; font-weight:bold;text-align:center">
+                                                            <div id="@Html_PlanTimeNgay">
+                                                                @*
+                                                                    <input id="@Id_PlanTimeNgay" type="text" onchange="TextChange('@Html_PlanTimeNgay','@Html_PlanTimeDem','@Id_PlanDem','@Id_PlanNgay','@Id_PlanTimeNgay','@Id_PlanTimeDem','@datestart','@dateend','@kq.Cavity','@kq.Cycle_Time','@stock.Stock1','@kq.Manpower','@kq.Machine','@kq.Machine_No_','@psi','@ViewBag.Week','@Id_Validate1','@kehoach','@Id_Kehoach','@strId_Balance1','@day','@thang','@nam','@Id_PlanTimeNgay','@Id_PlanNgay','@code_assy',this.value)" class="edit" />
+                                                                *@
+                                                            </div>
+                                                            <span id="@Id_Validate1" style="color:red;"></span>
+                                                        </td>
+                                                        <td style="background-color:sandybrown; font-weight:bold;text-align:center">
+                                                            <div id="@Id_PlanNgay">
+
+                                                            </div>
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td style="background-color:sandybrown; font-weight:bold;text-align:center">
+                                                            <div id="@Html_PlanTimeDem">
+                                                                @*
+                                                                    <input id="@Id_PlanTimeDem" type="text" onchange="TextChange('@Html_PlanTimeNgay','@Html_PlanTimeDem','@Id_PlanDem','@Id_PlanNgay','@Id_PlanTimeNgay','@Id_PlanTimeDem','@datestart','@dateend','@kq.Cavity','@kq.Cycle_Time','@stock.Stock1','@kq.Manpower','@kq.Machine','@kq.Machine_No_','@psi','@ViewBag.Week','@Id_Validate','@kehoach','@Id_Kehoach','@strId_Balance1','@day','@thang','@nam','@Id_PlanTimeDem','@Id_PlanDem','@code_assy',this.value)" class="edit" />
+                                                                *@
+                                                            </div>
+                                                            <span id="@Id_Validate" style="color:red;"></span>
+                                                        </td>
+                                                        
+                                                        <td style="background-color:sandybrown; font-weight:bold;text-align:center">
+                                                            <div id="@Id_PlanDem">
+                                                            </div>
+                                                        </td>
+
+                                                        <td style="background-color:sandybrown; font-weight:bold;text-align:center">
+                                                            <div id="@Html_PlanTimeNgay">
+                                                                @*
+                                                                    <input id="@Id_PlanTimeNgay" type="text" onchange="TextChange('@Html_PlanTimeNgay','@Html_PlanTimeDem','@Id_PlanDem','@Id_PlanNgay','@Id_PlanTimeNgay','@Id_PlanTimeDem','@datestart','@dateend','@kq.Cavity','@kq.Cycle_Time','@stock.Stock1','@kq.Manpower','@kq.Machine','@kq.Machine_No_','@psi','@ViewBag.Week','@Id_Validate1','@kehoach','@Id_Kehoach','@strId_Balance1','@day','@thang','@nam','@Id_PlanTimeNgay','@Id_PlanNgay','@code_assy',this.value)" class="edit" />
+                                                                *@
+                                                            </div>
+                                                            <span id="@Id_Validate1" style="color:red;"></span>
+                                                        </td>
+                                                        <td style="background-color:sandybrown; font-weight:bold;text-align:center">
+                                                            <div id="@Id_PlanNgay">
+
+                                                            </div>
+                                                        </td>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (u.Date == dateStart)
+                                                    {
+                                                        <td style="background-color:sandybrown; font-weight:bold;text-align:center">
+                                                            <div id="@Html_PlanTimeDem">
+                                                                <input id="@Id_PlanTimeDem" type="text" onchange="TextChange('@kq.Machine_No_','@Html_PlanTimeNgay','@Html_PlanTimeDem','@Id_PlanDem','@Id_PlanNgay','@Id_PlanTimeNgay','@Id_PlanTimeDem','@datestart','@dateend','@kq.Cavity','@kq.Cycle_Time','@stock.Stock1','@kq.Manpower','@kq.Machine','@kq.Machine_No_','@psi','@ViewBag.Week','@Id_Validate','@kehoach','@Id_KHBS','@strId_Balance','@strdate','@Id_PlanTimeDem','@Id_PlanDem','@code_assy')" class="edit" />
+                                                                <br />
+                                                                <span style="font-weight:bold">Start</span>
+                                                            </div>
+
+                                                            @if (kehoach == 0)
+                                                            {
+                                                                <span style="color:red">Code này không có kế hoạch!</span>
+                                                            }
+
+                                                            @if (kehoach < 0)
+                                                            {
+                                                                var sodu = kehoach * -1;
+                                                                <span style="color:red">Code này còn dư:</span>
+                                                                <br />
+                                                                <span style="color:aqua">@sodu</span>
+                                                            }
+                                                            <span id="@Id_Validate" style="color:red;"></span>
+                                                        </td>
+
+                                                        <td style="background-color:sandybrown; font-weight:bold;text-align:center">
+                                                            <div id="@Id_PlanDem">
+                                                            </div>
+                                                        </td>
+
+                                                        <td style="background-color:sandybrown; font-weight:bold;text-align:center">
+                                                            <div id="@Html_PlanTimeNgay">
+                                                                @*
+                                                                    <input id="@Id_PlanTimeNgay" type="text" onchange="TextChange('@Html_PlanTimeNgay','@Html_PlanTimeDem','@Id_PlanDem','@Id_PlanNgay','@Id_PlanTimeNgay','@Id_PlanTimeDem','@datestart','@dateend','@kq.Cavity','@kq.Cycle_Time','@stock.Stock1','@kq.Manpower','@kq.Machine','@kq.Machine_No_','@psi','@ViewBag.Week','@Id_Validate1','@kehoach','@Id_Kehoach','@strId_Balance','@day','@thang','@nam','@Id_PlanTimeNgay','@Id_PlanNgay','@code_assy',this.value)" class="edit" />
+                                                                *@
+                                                            </div>
+                                                            <span id="@Id_Validate1" style="color:red;"></span>
+                                                        </td>
+
+                                                        <td style="background-color:sandybrown; font-weight:bold;text-align:center">
+                                                            <div id="@Id_PlanNgay">
+
+                                                            </div>
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td style="background-color:sandybrown; font-weight:bold;text-align:center">
+                                                            <div id="@Html_PlanTimeDem">
+                                                            </div>
+                                                            <span id="@Id_Validate" style="color:red;"></span>
+                                                        </td>
+                                                        
+                                                        <td style="background-color:sandybrown; font-weight:bold;text-align:center">
+                                                            <div id="@Id_PlanDem">
+                                                            </div>
+                                                        </td>
+
+                                                        <td style="background-color:sandybrown; font-weight:bold;text-align:center">
+                                                            <div id="@Html_PlanTimeNgay">
+                                                            </div>
+                                                            <span id="@Id_Validate1" style="color:red;"></span>
+                                                        </td>
+                                                        <td style="background-color:sandybrown; font-weight:bold;text-align:center">
+                                                            <div id="@Id_PlanNgay">
+                                                            </div>
+                                                        </td>
+                                                    }
+                                                }
+
+                                                @if (product != null)
+                                                {
+                                                    <td>
+                                                        @product.Shift1_G_
+                                                    </td>
+                                                    <td>@product.Shift2_G_</td>
+                                                    <td>@product.Shift1_NG_</td>
+                                                    <td>@product.Shift2_NG_</td>
+                                                    DA.Good_D_ = product.Shift1_G_;
+                                                    DA.Good_N_ = product.Shift2_G_;
+                                                    DA.NG_D_ = product.Shift1_NG_;
+                                                    DA.NG_N_ = product.Shift2_NG_;
+                                                }
+                                                else
+                                                {
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                }
+                                                <td>@u.Code</td>
+                                                <td>@strDate</td>
+                                            </tr>
+                                            ngay = Convert.ToDateTime(u.Date);
+                                            temp = code_assy;
+                                            somay = Convert.ToInt32(kq.Machine_No_);
+                                            trongluongmay = kq.Machine;
+                                            capatemp = capa;
+                                            balance = 0 - kehoach;
+
+                                            DA.Statuss = "false";
+                                            DA.PSI = psi;
+                                            DA.ID_PlanTimeDem = Id_PlanTimeDem;
+                                            DA.ID_PlanTimeNgay = Id_PlanTimeNgay;
+                                            DA.Plan_D_ = 0;
+                                            DA.Plan_N_ = 0;
+                                            DA.C_Plan_Time_N_ = 0;
+                                            DA.Plan_Time_D_ = 0;
+                                            DA.Week = ViewBag.Week;
+                                            DA.ID_PlanDem = Id_PlanDem;
+                                            DA.ID_PlanNgay = Id_PlanNgay;
+                                            DA.Html_PlanTimeDem = Html_PlanTimeDem;
+                                            DA.Html_PlanTimeNgay = Html_PlanTimeNgay;
+                                            DA.FlagDem = false;
+                                            DA.FlagNgay = false;
+                                            DA.ID_ValidateDem = Id_Validate;
+                                            DA.ID_ValidateNgay = Id_Validate1;
+                                            DA.ID_Balance = strId_Balance;
+                                            DA.ID_KHBS = Id_KHBS;
+                                            DA.Html_SoMay = Html_SoMay;
+
+                                            if (kehoach > 0)
+                                            {
+                                                db.DA_Injection.Add(DA);
+                                                db.SaveChanges();
+                                            }
+                                        }
+                                    }
+                                    strId_Balance = "Id_Balance" + Convert.ToInt32(Id_balance_so);
+                                    <tr style="background-color:lightsalmon">
+                                        <td style="border:none"><div hidden>@temp</div></td>
+                                        <td style="border:none"><div hidden>@somay</div></td>
+                                        <td style="border:none"><div hidden>@trongluongmay</div></td>
+                                        <td style="border:none"><div hidden>@capatemp</div></td>
+                                        <td colspan="9" style="border-left:none"></td>
+                                        <td style="text-align:center">
+                                            Total Requirements:
+                                            <br />
+                                            @tong_require
+                                            @{
+                                                tong_require = 0;
+                                            }
+                                        </td>
+                                        <td style="text-align:center" colspan="4">Balance Plan: <div id="@strId_Balance">@balance</div></td>
+                                        <td colspan="2" style="text-align:center">Total Good</td>
+                                        <td colspan="2" style="text-align:center">Total Not Good</td>
+                                        <td colspan="2"></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan="24"></td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                        <tfoot>
+                        </tfoot>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer small text-muted"></div>
+    </div>
+
+
+    <!--Table Code Thieu-->
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-table"></i>
+            Danh sách code không thể lên kế hoạch
+        </div>
+        <div class="card-body">
+            <div class="table-responsive" id="Table">
+                <table class="table table-bordered" id="" width="100%" cellspacing="0">
+                    <thead>
+                        <tr style="text-align:center">
+                            <th>Code</th>
+                            <th>Số Máy</th>
+                            <th>Kế Hoạch</th>
+                            <th>Thời Gian Chạy</th>
+                            <th>Số Máy Thay Thế</th>
+                            <th>Thời Gian Còn Trống</th>
+                            <th>Trạng Thái</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr style="text-align:center">
+                            <th>Code</th>
+                            <th>Số Máy</th>
+                            <th>Kế Hoạch</th>
+                            <th>Thời Gian Chạy</th>
+                            <th>Số Máy Thay Thế</th>
+                            <th>Thời Gian Còn Trống</th>
+                            <th>Trạng Thái</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                    <tbody id="tblCodeThieu">
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!--End Table Code Thieu-->
+
+    <p class="small text-center text-muted my-5">
+    </p>
+</div>
+@*
+    @if (ViewBag.Error == null && ViewBag.ErrorWeek == null)
+    {
+        if (ViewBag.Assy != null)
+        {
+            PlanEntities dbb = new PlanEntities();
+            var flag = 0;
+            foreach (var check in ViewBag.Assy)
+            {
+                string code = check.Code;
+                var kg = dbb.CodeLists.FirstOrDefault(x => x.Injection_Code == code);
+                if (kg == null)
+                {
+                    flag = 1;
+                    break;
+                }
+            }
+
+            foreach (var check in ViewBag.VC)
+            {
+                string code = check.Code;
+                var kg = dbb.CodeLists.FirstOrDefault(x => x.Injection_Code == code);
+                if (kg == null)
+                {
+                    flag = 1;
+                    break;
+                }
+            }
+
+            foreach (var check in ViewBag.Ref)
+            {
+                string code = check.Code;
+                var kg = dbb.CodeLists.FirstOrDefault(x => x.Injection_Code == code);
+                if (kg == null)
+                {
+                    flag = 1;
+                    break;
+                }
+            }
+
+            if (flag == 1)
+            {
+                <dialog id="newcode" style="border:none;border-radius:5px">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h3>
+                                <i class="fas fa-table"></i>
+                                DANH SÁCH CODE MỚI CẦN THÊM VÀO CODELIST!
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive" style="height:400px;overflow:auto">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Code</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th>Code</th>
+                                        </tr>
+                                    </tfoot>
+                                    <tbody>
+                                        @if (ViewBag.Assy != null)
+                                        {
+                                            foreach (var li in ViewBag.Assy)
+                                            {
+                                                string code = li.Code;
+                                                var kg = dbb.CodeLists.FirstOrDefault(x => x.Injection_Code == code);
+                                                if (kg == null)
+                                                {
+                                                    <tr>
+                                                        <td>@li.Code</td>
+                                                    </tr>
+                                                }
+                                            }
+                                        }
+
+                                        @if (ViewBag.VC != null)
+                                        {
+                                            foreach (var li in ViewBag.VC)
+                                            {
+                                                string code = li.Code;
+                                                var kg = dbb.CodeLists.FirstOrDefault(x => x.Injection_Code == code);
+                                                if (kg == null)
+                                                {
+                                                    <tr>
+                                                        <td>@li.Code</td>
+                                                    </tr>
+                                                }
+                                            }
+                                        }
+
+                                        @if (ViewBag.Ref != null)
+                                        {
+                                            foreach (var li in ViewBag.Ref)
+                                            {
+                                                string code = li.Code;
+                                                var kg = dbb.CodeLists.FirstOrDefault(x => x.Injection_Code == code);
+                                                if (kg == null)
+                                                {
+                                                    <tr>
+                                                        <td>@li.Code</td>
+                                                    </tr>
+                                                }
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <input type="button" id="OK" value="OK" class="btn btn-success" onclick="OK()"/>
+                    </div>
+                </dialog>
+            }
+        }
+    }*@
+
+@*<dialog id="xuat_excel">
+        <h4>BẠN CÓ MUỐN XUẤT RA EXCEL KHÔNG?</h4>
+        <input type="button" id="OK" value="OK" class="btn btn-success" onclick="OK()" />
+    </dialog> *@
+<script type="text/javascript">
+    //var newcode = document.getElementById('newcode');
+    //newcode.showModal();
+
+    var arr = new Array();
+
+    async function TextChange(somay_start,html_plantimengay, html_plantimedem, id_plandem, id_planngay, id_plantimengay, id_plantimedem, dateStart, dateEnd,
+        cavity, cycle, stock, manpower, trongluongmay, somay, psi, Week, Id_Validatekehoach, kehoach,
+        Id_Kehoachbosung, strId_Balance, date, ID_PlanTime, ID_Plan, codeassy) {
+        var id_hours = document.getElementById(id_plantimedem);
+        var hours = parseFloat(id_hours.value)
+
+        if (hours < 0) {
+            var validate_html = 'Số giờ nhập không đúng!<br />'
+            var get_Id_Validatekehoach = document.getElementById(Id_Validatekehoach)
+            $(get_Id_Validatekehoach).html(validate_html)
+            $(get_Id_Validatekehoach).fadeIn()
+        }
+
+        if (hours > 12) {
+            var validate_html = 'Chỉ được nhập tối đa 12 giờ!<br />'
+            var get_Id_Validatekehoach = document.getElementById(Id_Validatekehoach)
+            $(get_Id_Validatekehoach).html(validate_html)
+            $(get_Id_Validatekehoach).fadeIn()
+        }
+
+        if (hours >= 0 && hours <= 12) {
+            var get_Id_Validatekehoach = document.getElementById(Id_Validatekehoach)
+            $(get_Id_Validatekehoach).fadeOut(500);
+
+            hours = parseFloat(hours);
+            var capa = 3600 / cycle * cavity;
+            capa = capa.toFixed(1);
+
+            var KQ_Plan = hours * capa;
+            KQ_Plan = Math.ceil(KQ_Plan);
+
+            //var html = '<input id="' + ID_Plan + '" type="text"  value="' + KQ_Plan + '" readonly class="edit"/>'
+            //var get_id = document.getElementById(ID_Plan)
+            //$(get_id).html(html)
+
+            var idKeHoachBoSung = document.getElementById(Id_Kehoachbosung)
+            var KeHoachBoSung = parseInt(idKeHoachBoSung.value)
+
+            if (kehoach > 0) {
+                await $.ajax({
+                    url: "/Json/StartPlan",
+                    data: {
+                        code: codeassy,
+                        strdate: date,
+                        week: Week,
+                        id_plantime: ID_PlanTime,
+                        psi: psi,
+                        plan: KQ_Plan,
+                        plantime: hours
+                    },
+                    dataType: "json",
+                    type: "GET",
+                    success: async function (data) {
+                        if (data != null) {
+                            await $.each(data, function (key, i) {
+                                var jsonDate = i.Date;
+                                var datesub = new Date(parseInt(jsonDate.substr(6)));
+                                var datestart = new Date(dateStart);
+
+                                var strDate = datesub.getFullYear() + '-' + (datesub.getMonth() + 1) + '-' + datesub.getDate();
+                                var strDateStart = datestart.getFullYear() + '-' + (datestart.getMonth() + 1) + '-' + datestart.getDate();
+
+                                var get_id;
+                                var html;
+                                /*
+                                if (strDate == strDateStart) {
+                                    //hiển thị thời gian của ca ngày
+                                    var char = "'";
+                                    if (i.Plan_Time_D_ > 0) {
+                                        var time = i.Plan_Time_D_;
+                                        var minute = time - Math.floor(time);
+                                        minute = minute * 60;
+                                        minute = Math.floor(minute); 
+                                        var value = Math.floor(time) + 'h ' + minute + 'm';
+                                        html = '<input id="' + i.ID_PlanTimeDem + '" type="text"  value="' + value + '" class="edit" onchange="TextChange(' + char +
+                                            somay_start + char +',' + char +
+                                            i.Html_PlanTimeNgay + char + ',' + char + i.Html_PlanTimeDem + char + ',' + char + i.ID_PlanDem + char + ',' + char + i.ID_PlanNgay + char + ',' + char + i.ID_PlanTimeNgay + char + ',' +
+                                            char + i.ID_PlanTimeDem + char + ',' + char + dateStart + char + ',' + char + dateEnd + char + ',' + char + i.Cavity + char + ',' + char + i.Cycle_time + char + ',' +
+                                            char + i.Stock + char + ',' + char + i.Manpower + char + ',' + char + i.Trong_Luong_May + char + ',' + char + i.So_May + char + ',' + char + i.PSI + char + ',' + char + i.Week + char + ',' +
+                                            char + i.ID_ValidateDem + char + ',' + char + i.Ke_Hoach + char + ',' + char + i.ID_KHBS + char + ',' + char + i.ID_Balance + char + ',' +
+                                            char + strDate + char + ',' + char + i.ID_PlanTimeDem + char + ',' + char + i.ID_PlanDem + char + ',' + char + i.Code + char + ')"/>' +
+                                            '<br /><span style="font-weight:bold">Start</span>'
+
+                                        get_id = document.getElementById(i.Html_PlanTimeDem)
+                                        $(get_id).html(html)
+
+                                        //hiển sản lượng ca ngày
+                                        html = '<input id="' + i.ID_PlanDem + '" type="text"  value="' + i.Plan_D_ + '" readonly class="edit"/>'
+                                        get_id = document.getElementById(i.ID_PlanDem)
+                                        $(get_id).html(html)
+
+                                        //hiển thị balance
+                                        html = '0'
+                                        get_id = document.getElementById(i.ID_Balance)
+                                        $(get_id).html(html)
+                                    }
+                                    else {
+                                        html = '<input id="' + i.ID_PlanTimeDem + '" type="text"  value="" class="edit" onchange="TextChange(' + char +
+                                            somay_start + char +',' + char +
+                                            i.Html_PlanTimeNgay + char + ',' + char + i.Html_PlanTimeDem + char + ',' + char + i.ID_PlanDem + char + ',' + char + i.ID_PlanNgay + char + ',' + char + i.ID_PlanTimeNgay + char + ',' +
+                                            char + i.ID_PlanTimeDem + char + ',' + char + dateStart + char + ',' + char + dateEnd + char + ',' + char + i.Cavity + char + ',' + char + i.Cycle_time + char + ',' +
+                                            char + i.Stock + char + ',' + char + i.Manpower + char + ',' + char + i.Trong_Luong_May + char + ',' + char + i.So_May + char + ',' + char + i.PSI + char + ',' + char + i.Week + char + ',' +
+                                            char + i.ID_ValidateDem + char + ',' + char + i.Ke_Hoach + char + ',' + char + i.ID_KHBS + char + ',' + char + i.ID_Balance + char + ',' +
+                                            char + strDate + char + ',' + char + i.ID_PlanTimeDem + char + ',' + char + i.ID_PlanDem + char + ',' + char + i.Code + char + ')"/>' +
+                                            '<br /><span style="font-weight:bold">Start</span>'
+
+                                        get_id = document.getElementById(i.Html_PlanTimeDem)
+                                        $(get_id).html(html)
+
+                                        html = ''
+                                        get_id = document.getElementById(i.ID_PlanDem)
+                                        $(get_id).html(html)
+
+                                        //hiển thị balance
+                                        html = '0'
+                                        get_id = document.getElementById(i.ID_Balance)
+                                        $(get_id).html(html)
+                                    }
+
+                                    //hiển thị thời gian của ca đêm
+                                    if (i.C_Plan_Time_N_ > 0) {
+                                        var time = i.C_Plan_Time_N_;
+                                        var minute = time - Math.floor(time);
+                                        minute = minute * 60;
+                                        minute = Math.floor(minute); 
+                                        var value = Math.floor(time) + 'h ' + minute + 'm';
+                                        html = '<input id="' + i.ID_PlanTimeNgay + '" type="text"  value="' + value + '" readonly class="edit"/>'
+                                        get_id = document.getElementById(i.Html_PlanTimeNgay)
+                                        $(get_id).html(html)
+
+                                        //hiển sản lượng ca đêm
+                                        html = '<input id="' + i.ID_PlanNgay + '" type="text"  value="' + i.Plan_N_ + '" readonly class="edit"/>'
+                                        get_id = document.getElementById(i.ID_PlanNgay)
+                                        $(get_id).html(html)
+
+                                        //hiển thị balance
+                                        html = '0'
+                                        get_id = document.getElementById(i.ID_Balance)
+                                        $(get_id).html(html)
+                                    }
+                                    else {
+                                        html = ''
+                                        get_id = document.getElementById(i.Html_PlanTimeNgay)
+                                        $(get_id).html(html)
+
+                                        get_id = document.getElementById(i.ID_PlanNgay)
+                                        $(get_id).html(html)
+
+                                        //hiển thị balance
+                                        html = '0'
+                                        get_id = document.getElementById(i.ID_Balance)
+                                        $(get_id).html(html)
+                                    }
+                                }
+                                else {
+                                    
+                                }
+                                */
+
+                                //hiển thị thời gian của ca ngày
+                                if (i.Plan_Time_D_ > 0) {
+                                    var time = i.Plan_Time_D_;
+                                    var minute = time - Math.floor(time);
+                                    minute = minute * 60;
+                                    minute = Math.floor(minute);
+                                    var value = Math.floor(time) + 'h ' + minute + 'm';
+                                    html = '<input id="' + i.ID_PlanTimeDem + '" type="text"  value="' + value + '" readonly class="edit"/>'
+                                    get_id = document.getElementById(i.Html_PlanTimeDem)
+                                    $(get_id).html(html)
+
+                                    var html = '<input id="' + i.ID_PlanDem + '" type="text"  value="' + i.Plan_D_ + '" readonly class="edit"/>'
+                                    get_id = document.getElementById(i.ID_PlanDem)
+                                    $(get_id).html(html)
+
+                                    //hiển thị balance
+                                    html = '0'
+                                    get_id = document.getElementById(i.ID_Balance)
+                                    $(get_id).html(html)
+                                }
+                                else {
+                                    html = ''
+                                    get_id = document.getElementById(i.Html_PlanTimeDem)
+                                    $(get_id).html(html)
+
+                                    get_id = document.getElementById(i.ID_PlanDem)
+                                    $(get_id).html(html)
+
+                                    //hiển thị balance
+                                    html = '0'
+                                    get_id = document.getElementById(i.ID_Balance)
+                                    $(get_id).html(html)
+                                }
+
+                                if (i.C_Plan_Time_N_ > 0) {
+                                    //hiển thị thời gian của ca đêm
+                                    var time = i.C_Plan_Time_N_;
+                                    var minute = time - Math.floor(time);
+                                    minute = minute * 60;
+                                    minute = Math.floor(minute);
+                                    var value = Math.floor(time) + 'h ' + minute + 'm';
+                                    html = '<input id="' + i.ID_PlanTimeNgay + '" type="text"  value="' + value + '" readonly class="edit"/>'
+                                    get_id = document.getElementById(i.Html_PlanTimeNgay)
+                                    $(get_id).html(html)
+
+                                    //hiển sản lượng ca đêm
+                                    html = '<input id="' + i.ID_PlanNgay + '" type="text"  value="' + i.Plan_N_ + '" readonly class="edit"/>'
+                                    get_id = document.getElementById(i.ID_PlanNgay)
+                                    $(get_id).html(html)
+
+                                    //hiển thị balance
+                                    html = '0'
+                                    get_id = document.getElementById(i.ID_Balance)
+                                    $(get_id).html(html)
+                                }
+                                else {
+                                    html = ''
+                                    get_id = document.getElementById(i.Html_PlanTimeNgay)
+                                    $(get_id).html(html)
+
+                                    get_id = document.getElementById(i.ID_PlanNgay)
+                                    $(get_id).html(html)
+
+                                    //hiển thị balance
+                                    html = '0'
+                                    get_id = document.getElementById(i.ID_Balance)
+                                    $(get_id).html(html)
+                                }
+                            });
+
+                            //hiển thị code thiếu
+                            await $.get("/Json/GetCodeThieu?week=" + Week, function (data) {
+                                if (data != null) {
+                                    var html = '';
+                                    var strId = '';
+                                    var strIdbtn = '';
+                                    var strHtmlbtn = '';
+                                    var strHtml_trangthai = '';
+                                    var iId = 0;
+                                    var char = "'";
+                                    $.each(data,async function (key, i) {
+                                        var time = parseFloat(i.Ke_Hoach) / parseFloat(i.Capa);
+                                        var minute = time - Math.floor(time);
+                                        minute = minute * 60;
+                                        minute = Math.floor(minute); 
+                                        var value_time = Math.floor(time) + 'h ' + minute + 'm';
+                                        await $.ajax({
+                                            url: "/Json/GetOption",
+                                            data: {
+                                                somay: i.So_May,
+                                                time: time,
+                                                week: Week,
+                                                somay_start: somay_start,
+                                                plantime: hours
+                                            },
+                                            dataType: "json",
+                                            type: "GET",
+                                            success: function (option) {
+                                                strId = 'Time' + iId;
+                                                strIdbtn = 'Btn' + iId;
+                                                strHtmlbtn = 'HtmlBtn' + iId;
+                                                strHtml_trangthai = 'HtmlTrangthai' + iId;
+                                                iId++;
+                                                var html2 = '';
+                                                var kehoach = i.Ke_Hoach + i.Ke_Hoach_Bo_Sung;
+                                                $.each(option, function (key, val) {
+                                                    html2 += '<option value="'+val+'">'+val+'</option>'
+                                                })
+                                                html +=
+                                                    '<tr style="text-align:center">' +
+                                                    '<td>' + i.Code + '</td >' +
+                                                    '<td>' + i.So_May + '</td >' +
+                                                    '<td>' + kehoach + '</td >' +
+                                                    '<td>' + value_time + '</td>' +
+                                                    '<td>' +
+                                                    '<select class="form-control" onchange="TimeBlank('+char+somay_start+char+','+char+hours+char+','+char+i.Html_SoMay+char+','+char+strHtml_trangthai+char+','+char+strHtmlbtn+char+','+char+i.PSI+char+','+char+kehoach+char+','+char+i.Code+char+','+char+strIdbtn+char+','+char+Week+char+',this,'+char+strId+char+')">' +
+                                                    '<option selected>Chọn số máy</option>' + html2 +
+                                                    '</select>' +
+                                                    '</td>' +
+                                                    '<td id="'+ strId +'"></td>' +
+                                                    '<td id="'+ strHtml_trangthai +'"><span style="color:red;font-weight:bold">Chưa lên kế hoạch</span></td>' +
+                                                    '<td id="' + strHtmlbtn + '"><input id="'+strIdbtn+'" type="button" value="OK" class="btn btn-success"/></td>' +
+                                                    '</tr> ';
+                                                $('#tblCodeThieu').html(html);
+                                            }
+                                        });
+                                    });
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    async function TimeBlank(somay_start,plantime,html_somay,strHtml_Trangthai, strHtml, psi, kehoach, code, strIdbtn, week, val, strId) {
+        var value = val.value;
+        await $.ajax({
+            url: "/Json/GetTimeOption",
+            data: {
+                week: week,
+                somay: value,
+                somay_start: somay_start,
+                plantime: plantime
+            },
+            dataType: "json",
+            type: "GET",
+            success: function (time_option) {
+                var minute;
+                if (time_option <= 0) {
+                    time_option = 0;
+                    minute = 0;
+                }
+                else {
+                    minute = time_option - Math.floor(time_option); 
+                    minute = minute * 60; 
+                    minute = Math.floor(minute); 
+                }
+                var value_time = Math.floor(time_option) + 'h ' + minute + 'm';
+                var html = '' + value_time + ''
+                get_id = document.getElementById(strId);
+                $(get_id).html(html)
+            }
+        });
+
+        var getId = document.getElementById(strIdbtn);
+        $(getId).off().click(function () {
+            ChangeMachine(code, week, kehoach, value, psi, strHtml, strHtml_Trangthai, html_somay,plantime,somay_start);
+        });
+    }
+
+    async function ChangeMachine(code, week, kehoach_edit, somay, psi, strHtml, strHtmltrangthai, html_somay, plantime, somay_start) {
+        await $.ajax({
+            url: "/Json/ChangeMachine",
+            data: {
+                code: code,
+                week: week,
+                kehoach_edit: kehoach_edit,
+                somay: somay,
+                psi: psi,
+                somay_start: somay_start,
+                plantime: plantime
+            },
+            dataType: "json",
+            type: "GET",
+            success: function (co) {
+                if (co == false) {
+                    var getId = document.getElementById(strHtml);
+                    var html = '<img src="../Content/Image/iconYes.png" />';
+                    $(getId).html(html);
+
+                    getId = document.getElementById(strHtmltrangthai);
+                    html = '<span style="font-weight:bold">Đã lên kế hoạch</span>';
+                    $(getId).html(html);
+
+                    $.ajax({
+                        url: "/Json/GetCodeChanged",
+                        data: {
+                            code: code,
+                            week: week,
+                            psi: psi,
+                            somay: somay
+                        },
+                        dataType: "json",
+                        type: "GET",
+                        success: function (data) {
+                            if (data != null) {
+                                $.each(data, function (key, i) {
+                                    getId = document.getElementById(i.Html_SoMay);
+                                    html = '' + i.So_May + '';
+                                    $(getId).html(html);
+
+                                    //hiển thị thời gian của ca ngày
+                                    if (i.Plan_Time_D_ > 0) {
+                                        var time = i.Plan_Time_D_;
+                                        var minute = time - Math.floor(time);
+                                        minute = minute * 60;
+                                        minute = Math.floor(minute); 
+                                        var value = Math.floor(time) + 'h ' + minute + 'm';
+                                        html = '<input id="' + i.ID_PlanTimeDem + '" type="text"  value="' + value + '" readonly class="edit"/>'
+                                        getId = document.getElementById(i.Html_PlanTimeDem)
+                                        $(getId).html(html)
+
+                                        var html = '<input id="' + i.ID_PlanDem + '" type="text"  value="' + i.Plan_D_ + '" readonly class="edit"/>'
+                                        getId = document.getElementById(i.ID_PlanDem)
+                                        $(getId).html(html)
+
+                                        //hiển thị balance
+                                        html = '0'
+                                        getId = document.getElementById(i.ID_Balance)
+                                        $(getId).html(html)
+                                    }
+                                    else {
+                                        html = ''
+                                        getId = document.getElementById(i.Html_PlanTimeDem)
+                                        $(getId).html(html)
+
+                                        getId = document.getElementById(i.ID_PlanDem)
+                                        $(getId).html(html)
+
+                                        //hiển thị balance
+                                        html = '0'
+                                        getId = document.getElementById(i.ID_Balance)
+                                        $(getId).html(html)
+                                    }
+
+                                    if (i.C_Plan_Time_N_ > 0) {
+                                        //hiển thị thời gian của ca đêm
+                                        var time = i.C_Plan_Time_N_;
+                                        var minute = time - Math.floor(time);
+                                        minute = minute * 60;
+                                        minute = Math.floor(minute); 
+                                        var value = Math.floor(time) + 'h ' + minute + 'm';
+                                        html = '<input id="' + i.ID_PlanTimeNgay + '" type="text"  value="' + value + '" readonly class="edit"/>'
+                                        getId = document.getElementById(i.Html_PlanTimeNgay)
+                                        $(getId).html(html)
+
+                                        //hiển sản lượng ca đêm
+                                        html = '<input id="' + i.ID_PlanNgay + '" type="text"  value="' + i.Plan_N_ + '" readonly class="edit"/>'
+                                        getId = document.getElementById(i.ID_PlanNgay)
+                                        $(getId).html(html)
+
+                                        //hiển thị balance
+                                        html = '0'
+                                        getId = document.getElementById(i.ID_Balance)
+                                        $(getId).html(html)
+                                    }
+                                    else {
+                                        html = ''
+                                        getId = document.getElementById(i.Html_PlanTimeNgay)
+                                        $(getId).html(html)
+
+                                        getId = document.getElementById(i.ID_PlanNgay)
+                                        $(getId).html(html)
+
+                                        //hiển thị balance
+                                        html = '0'
+                                        getId = document.getElementById(i.ID_Balance)
+                                        $(getId).html(html)
+                                    }
+                                })
+                            }
+                        }
+                    });
+                }
+                else {
+                    var cfmOverTime = document.querySelector("#cfmOverTime");
+                    cfmOverTime.showModal()
+                }
+            }
+        });
+    }
+  
+    function Tim() {
+        var input = document.getElementById('myInput')
+        var mytable = document.getElementById('myTable')
+        var tag = mytable.getElementsByTagName('tr')
+        var value = $(input).val().toLowerCase();
+
+        $("#myTable tr").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    }
+
+    function ChangeKHBS(Week, code, date, id_khbs, psi) {
+        var get_id = document.getElementById(id_khbs);
+        var khbs = get_id.value;
+        $.ajax({
+            url: "/Json/UpdateKHBS",
+            data: {
+                code: code,
+                date: date,
+                week: Week,
+                khbs: khbs,
+                psi: psi
+            },
+            dataType: "json",
+            type: "GET",
+            success: function (data) {
+                $.each(data, function (key, val) {
+                    var html = '' + khbs + ''
+                    get_id = document.getElementById(val.ID_KHBS);
+                    $(get_id).html(html)
+                });
+            }
+        });
+    }
+
+    function OK() {
+        var ok = document.getElementById('newcode');
+        newcode.close();
+    }
+
+    function CloseCfmOverTime() {
+        var cfmOverTime = document.querySelector("#cfmOverTime");
+        cfmOverTime.close();
+    }
+</script>
+
+<dialog id="cfmOverTime" style="text-align:center;border:none;font-weight:bold;border-radius:10px">
+    <span style="color:red">
+        Máy Này Không Đủ Thời Gian Để Lên Kế Hoạch!<br />
+        Vui Lòng Chọn Máy Khác!
+    </span>
+    <br />
+    <input type="button" class="btn btn-success" value="OK" onclick="CloseCfmOverTime()" />
+</dialog>

@@ -1,0 +1,100 @@
+﻿@model DA_Injection
+@{
+    ViewBag.Title = "View_Product";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <form action="/Home/View_Product" method="post">
+            @Html.AntiForgeryToken()
+            <h3 style="color:red">Chọn Ngày Xem</h3>
+          
+            <h5>Ngày:</h5> <input type="date" ng-model="Date" name="date" required class="form-control" value="@ViewBag.Date"/>
+            <br />
+            <input type="hidden" ng-model="Week" name="week" value="@ViewBag.Week" />
+            <input type="submit" class="btn btn-danger" value="OK" />
+        </form>
+    </ol>
+    <!-- DataTables Example -->
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-table"></i>
+            Production result
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr style="text-align:center">
+                            <th>Date</th>
+                            <th>Code</th>
+                            <th>Số Máy</th>
+                            <th>Plan(Day)</th>
+                            <th>Good (Shift1)</th>
+                            <th>Not Good (Shift1)</th>
+                            <th>Plan(Night)</th>
+                            <th>Good (Shift3)</th>
+                            <th>Not Good (Shift3)</th>
+                            <th>Edit</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr style="text-align:center">
+                            <th>Date</th>
+                            <th>Code</th>
+                            <th>Số Máy</th>
+                            <th>Plan(Day)</th>
+                            <th>Good (Shift1)</th>
+                            <th>Not Good (Shift1)</th>
+                            <th>Plan(Night)</th>
+                            <th>Good (Shift3)</th>
+                            <th>Not Good (Shift3)</th>
+                            <th>Edit</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @if(ViewBag.Product != null)
+                        {
+                            string week = ViewBag.Week;
+
+                            foreach(var x in ViewBag.Product)
+                            {
+                                <tr style="text-align:center">
+                                    <th style="background-color:lightskyblue">
+                                        @{ 
+                                            DateTime date = x.Date;
+                                            string shortDate = date.ToShortDateString();
+                                        }
+                                        @shortDate
+                                    </th>
+                                    <th style="background-color:lightskyblue">@x.Code</th>
+                                     <th style="background-color:lightskyblue">@x.So_May</th>
+                                    <th style="background-color:lightsalmon">@x.Plan_D_</th>
+                                    <th>@x.Good_D_</th>
+                                    <th>@x.NG_D_ </th>
+                                    <th style="background-color:darksalmon">@x.Plan_N_</th>
+                                    <th>@x.Good_N_</th>
+                                    <th>@x.NG_N_</th>
+                                    <th>
+                                        <a href="/Home/ViewEditKQSX?strdate=@shortDate&code=@x.Code&somay=@x.So_May&week=@week" class="btn btn-danger">
+                                            <i class="fas fa-fw fa-edit"></i> &nbsp;Edit
+                                        </a>
+                                    </th>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer small text-muted"></div>
+    </div>
+    <p class="small text-center text-muted my-5">
+
+    </p>
+</div>
+

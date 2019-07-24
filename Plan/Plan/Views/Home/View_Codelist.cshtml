@@ -1,0 +1,97 @@
+﻿@model CodeList
+@{
+    ViewBag.Title = "View_Codelist";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+        background-color: antiquewhite;
+    }
+
+    .table tr{
+        text-align:center
+    }
+</style>
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/Home/Add_Codelist" class="btn btn-success"><i class="fa fa-plus-circle"></i> Thêm code mới</a>
+        </li>
+    </ol>
+    <!-- DataTables Example -->
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-table"></i>
+            Data code list
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Item Name</th>
+                            <th>Machine No.</th>
+                            <th>Machine</th>
+                            <th>Cycle Time</th>
+                            <th>Cavity</th>
+                            <th>Manpower</th>
+                            <th>Resin</th>
+                            <th>Resin Code</th>
+                            <th>Weight(g)</th>
+                            <th>Another Code</th>
+                            <th>Chỉnh sửa</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Code</th>
+                            <th>Item Name</th>
+                            <th>Machine No.</th>
+                            <th>Machine</th>
+                            <th>Cycle Time</th>
+                            <th>Cavity</th>
+                            <th>Manpower</th>
+                            <th>Resin</th>
+                            <th>Resin Code</th>
+                            <th>Weight(g)</th>
+                            <th>Another Code</th>
+                            <th>Chỉnh sửa</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @foreach (var u in ViewBag.Codelist)
+                        {
+                        <tr>
+                            <td>@u.Injection_Code</td>
+                            <td>@u.ItemName</td>
+                            <td>@u.Machine_No_</td>
+                            <td>@u.Machine</td>
+                            <td>@u.Cycle_Time</td>
+                            <td>@u.Cavity</td>
+                            <td>@u.Manpower</td>
+                            <td>@u.Resin</td>
+                            <td>@u.Resin_Code</td>
+                            <td>@u.Weight</td>
+                            <td>@u.Another_Code</td>
+                            <td>
+                                <a href="@Url.Action("Edit_Codelist", "Home", new { Code = u.Injection_Code })" class="btn btn-danger">
+                                    <i class="fas fa-fw fa-edit"></i> &nbsp;Sửa
+                                </a>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer small text-muted"></div>
+    </div>
+    <p class="small text-center text-muted my-5">
+
+    </p>
+</div>
+

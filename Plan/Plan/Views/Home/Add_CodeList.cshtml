@@ -1,0 +1,91 @@
+﻿@model CodeList
+@{
+    ViewBag.Title = "Add_CodeList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .edit {
+        border-radius: 5px;
+        height: 40px;
+        border: 1px solid #ced4da;
+        width: 150px;
+        text-align: center;
+        outline: none
+    }
+</style>
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    @*<ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="#">Dashboard</a>
+            </li>
+            <li class="breadcrumb-item active">Tables</li>
+        </ol>*@
+    <!-- DataTables Example -->
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-table"></i>
+            Thêm code mới
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                @using (Html.BeginForm("Add_CodeList", "Home", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <hr />
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Machine No.</th>
+                                <th>Machine</th>
+                                <th>Cycle Time</th>
+                                <th>Cavity</th>
+                                <th>Manpower</th>
+                                <th>Resin</th>
+                                <th>Resin Code</th>
+                                <th>Weight(g)</th>
+                                <th>Another Code</th>
+                                <th>Thêm</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Code</th>
+                                <th>Machine No.</th>
+                                <th>Machine</th>
+                                <th>Cycle Time</th>
+                                <th>Cavity</th>
+                                <th>Manpower</th>
+                                <th>Resin</th>
+                                <th>Resin Code</th>
+                                <th>Weight(g)</th>
+                                <th>Another Code</th>
+                                <th>Thêm</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    @Html.TextBoxFor(m => m.Injection_Code, new { @class = "edit",@required="true" })
+                                    @Html.ValidationMessageFor(m => m.Injection_Code, "", new { @class = "text-danger" })
+                                </td>
+                                <td>@Html.TextBoxFor(m => m.Machine_No_, new { @class = "edit" })</td>
+                                <td>@Html.TextBoxFor(m => m.Machine, new { @class = "edit" })</td>
+                                <td>@Html.TextBoxFor(m => m.Cycle_Time, new { @class = "edit" })</td>
+                                <td>@Html.TextBoxFor(m => m.Cavity, new { @class = "edit" })</td>
+                                <td>@Html.TextBoxFor(m => m.Manpower, new { @class = "edit" })</td>
+                                <td>@Html.TextBoxFor(m => m.Resin, new { @class = "edit"})</td>
+                                <td>@Html.TextBoxFor(m => m.Resin_Code, new { @class = "edit" })</td>
+                                <td>@Html.TextBoxFor(m => m.Weight, new { @class = "edit" })</td>
+                                <td>@Html.TextBoxFor(m => m.Another_Code, new { @class = "edit" })</td>
+                                <td><input type="submit" class="btn btn-outline-danger" value="Thêm" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                }
+            </div>
+            <div class="card-footer small text-muted"></div>
+        </div>
+    </div>
+

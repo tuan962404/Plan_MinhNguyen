@@ -1,0 +1,96 @@
+﻿
+@{
+    ViewBag.Title = "Import_PSI_WM_REF";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Import PSI WM REF</h2>
+
+@using (Html.BeginForm("Import_PSI_WM_REF", "Home", FormMethod.Post, new { EncType = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <hr />
+    @Html.ValidationSummary("", new { @class = "text-danger" })
+    <div class="form-group">
+
+        <div class="col-md-10">
+            <input type="file" name="file"/>
+            <br /><br />
+            <input type="submit" class="btn btn-danger" value="Import" />
+        </div>
+    </div>
+}
+
+<br />
+
+<h2>Import PSI VC</h2>
+
+@using (Html.BeginForm("Import_PSI_VC", "Home", FormMethod.Post, new { EncType = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <hr />
+    @Html.ValidationSummary("", new { @class = "text-danger" })
+    <div class="form-group">
+
+        <div class="col-md-10">
+            <input type="file" name="file" />
+            <br /><br />
+            <input type="submit" class="btn btn-danger" value="Import" />
+
+        </div>
+    </div>
+}
+
+<br />
+
+<h2>Import Assy PSI Shortage</h2>
+
+@using (Html.BeginForm("Import_Assy_PSI_Shortage", "Home", FormMethod.Post, new { EncType = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <hr />
+    @Html.ValidationSummary("", new { @class = "text-danger" })
+    <div class="form-group">
+
+        <div class="col-md-10">
+            <input type="file" name="file" />
+            <br /><br />
+            <input type="submit" class="btn btn-danger" value="Import" />
+        </div>
+    </div>
+}
+<br />
+<h2>Import Stock</h2>
+
+@using (Html.BeginForm("Import_Stock", "Home", FormMethod.Post, new { EncType = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <hr />
+    @Html.ValidationSummary("", new { @class = "text-danger" })
+    <div class="form-group">
+
+        <div class="col-md-10">
+            <input type="file" name="file" />
+            <br /><br />
+            <input type="submit" class="btn btn-danger" value="Import" />
+        </div>
+    </div>
+}
+
+<br />
+<h2>Import Resin Stock</h2>
+
+@using (Html.BeginForm("Import_ResinStock", "Home", FormMethod.Post, new { EncType = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <hr />
+    @Html.ValidationSummary("", new { @class = "text-danger" })
+    <div class="form-group">
+
+        <div class="col-md-10">
+            <input type="file" name="file" />
+            <br /><br />
+            <input type="submit" class="btn btn-danger" value="Import" />
+        </div>
+    </div>
+}

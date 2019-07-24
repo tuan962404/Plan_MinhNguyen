@@ -1,0 +1,36 @@
+﻿
+@{
+    ViewBag.Title = "UpdateDomain";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model Plan.Models.MDomain
+<div class="container">
+    <div class="card card-login mx-auto mt-5">
+        <div class="card-header" style="text-align:center">Cập Nhật Domain</div>
+        <div class="card-body">
+            <div class="text-center mb-4">
+                <h4>Nhập Domain Hiện Tại</h4>
+            </div>
+            <form action="/Account/UpdateDomain" method="post" autocomplete="off">
+                @Html.AntiForgeryToken()
+                @{ 
+                    if(ViewBag.Success == null)
+                    {
+                        @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                    }
+                    else
+                    {
+                        @Html.ValidationSummary(false, "", new { @class = "text-success" })
+                    }
+                }
+                <div class="form-group">
+                    <input type="text" id="" class="form-control" placeholder="Enter Domain Current" required="required" autofocus="autofocus" ng-model="Domain1" name="Domain1">
+                    <br />
+                    <input type="password" id="" class="form-control" placeholder="Confirm Password" required="required" autofocus="autofocus" ng-model="Password" name="Password">
+                </div>
+                <input type="submit" class="btn btn-primary btn-block" value="Cập nhật" />
+            </form>
+        </div>
+    </div>
+</div>
+

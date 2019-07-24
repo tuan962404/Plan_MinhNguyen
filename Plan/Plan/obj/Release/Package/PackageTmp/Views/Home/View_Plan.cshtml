@@ -1,0 +1,1025 @@
+﻿@model DA_Injection
+@{
+    ViewBag.Title = "View_Plan";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    #Table {
+        overflow-y: auto;
+        height: 550px;
+    }
+
+        #Table th {
+            position: sticky;
+            top: 0;
+        }
+
+    /* Just common table stuff. Really. */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        padding: 8px 16px;
+    }
+
+    th {
+        background: lightblue;
+    }
+
+
+    .edit {
+        border-radius: 5px;
+        height: 40px;
+        border: 1px solid #ced4da;
+        width: 100px;
+        text-align: center;
+        outline: none
+    }
+
+</style>
+
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    @{ 
+        if(ViewBag.Plan != null && ViewBag.Plan.Count > 0)
+        {
+            <ol class="breadcrumb">
+                <form action="/Home/ExportPlanDaily" method="post">
+                    @Html.AntiForgeryToken()
+                    <h3 style="color:red">Chọn Ngày Xuất</h3>
+                    <h5>Chọn Ngày:</h5>
+                    <input type="date" ng-model="Date" name="date" required class="form-control" />
+                    <input hidden ng-model="Week" name="Week" required value="@ViewBag.Week" />
+                    <br />
+                    <input type="submit" class="btn btn-success" value="Xuất Excel" />
+                </form>
+            </ol>
+        }
+    }
+    
+    <!-- DataTables Example -->
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <h4 class="fas fa-table" style="float:left;margin-top:3px"></h4>
+            @{
+                if (ViewBag.DateStart != null)
+                {
+                    DateTime dateStart = ViewBag.DateStart;
+                    int iDateStart = dateStart.Day;
+
+                    DateTime dateEnd = ViewBag.DateEnd;
+                    string strDateEnd = dateEnd.ToShortDateString();
+                    <h4 style="text-transform:uppercase;float:left;margin-left:5px">BẢNG THEO DÕI SỐ LƯỢNG SẢN XUẤT (@iDateStart - @strDateEnd) -- @ViewBag.Week</h4>
+                }
+            }
+
+            <div style="float:right"><input id="myInput" type="text" placeholder="  Search.." onkeyup="Tim()" style="border-radius:5px;height:35px;border-color:darkgrey;box-shadow: 0 0 0 1pt lightblue;outline:none"></div>
+        </div>
+        <div class="card-body">
+
+            <div class="table-responsive" id="Table">
+                <table class="table  table-hover" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Good/Plan</th>
+                            <th>Ngày</th>
+                            <th>Mã Hàng/Code</th>
+                            <th>Item Name</th>
+                            <th>Số Máy</th>
+                            <th>MÁY</th>
+                            <th>Kế Hoạch/Plan</th>
+                            <th>KẾ HOẠCH/BỔ SUNG</th>
+                            <th>Manpower</th>
+                            <th>Stock </th>
+                            <th>Cycle time</th>
+                            <th>Cavity</th>
+                            <th>Capa/Sheep(11)</th>
+                            <th>Ngày</th>
+                            <th>Requirements</th>
+                            <th>Plan Time(D)</th>
+                            <th>Plan(D)</th>
+                            <th>Plan Time(N)</th>
+                            <th>Plan(N)</th>
+                            <th>Good<br />Shift1</th>
+                            <th>Good<br />Shift3</th>
+                            <th>NG<br />Shift1</th>
+                            <th>NG<br />Shift3</th>
+                            <th>%NG<br />Shift1</th>
+                            <th>%NG<br />Shift3</th>
+                            <th>Mã Hàng/Code</th>
+                            <th>Ngày</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                    </tfoot>
+                    <tbody id="myTable" class="table table-bordered" style="text-align:center">
+                        @if (ViewBag.Plan != null && ViewBag.Plan.Count > 0)
+                        {
+                            PlanEntities db = new PlanEntities();
+
+                            DateTime ngay = DateTime.Now;
+                            DateTime dateStart = ViewBag.DateStart;
+                            int somay_temp = 0;
+                            string trongluongtemp = "";
+                            int kehoachtemp = 0;
+                            int khbstemp = 0;
+                            double capatemp = 0;
+                            string temp = "false";
+                            int balance = 0;
+                            string PSI = "";
+                            string week = "";
+                            var sumGood = -1;
+                            var sumNotGood = -1;
+                            var strsumGood = "";
+                            var strsumNotGood = "";
+                            var sumPlan = 0;
+                            var sumkhbs = 0;
+                            double good_plan = 0;
+                            var tong_require = 0;
+
+                            foreach (var x in ViewBag.Plan)
+                            {
+                                string code = x.Code;
+                                DateTime date = x.Date;
+                                week = x.Week;
+                                sumGood = -1;
+                                sumNotGood = -1;
+                                strsumGood = "";
+                                strsumNotGood = "";
+
+                                if (temp != x.Code)
+                                {
+                                    if (temp != "false")
+                                    {
+                                        <tr style="background-color:lightsalmon">
+                                            @if (good_plan <= 10)
+                                            {
+                                                <td style="background-color:red;font-weight:bold;color:white;border:none">@good_plan%</td>
+                                            }
+                                            else if (good_plan > 10 && good_plan < 100)
+                                            {
+                                                <td style="background-color:yellow;font-weight:bold;border:none">@good_plan%</td>
+                                            }
+
+                                            @if (good_plan >= 100)
+                                            {
+                                                good_plan = 100;
+                                                <td style="background-color:lawngreen;font-weight:bold;border:none">@good_plan%</td>
+                                            }
+
+                                            <td style="border:none"><div hidden>@temp</div></td>
+                                            <td style="border:none"><div hidden>@somay_temp</div></td>
+                                            <td style="border:none"><div hidden>@trongluongtemp</div></td>
+                                            <td style="border:none"><div hidden>@capatemp</div></td>
+                                            <td colspan="9" style="border-left:none"></td>
+                                            <td style="text-align:center;font-weight:bold">
+                                                Total Requirements:<br /> @tong_require
+                                                @{
+                                                    tong_require = 0;
+                                                }
+                                            </td>
+                                            <td style="text-align:center;font-weight:bold" colspan="4">
+                                                Balance Plan:
+                                                @{
+                                                    sumPlan = db.DA_Injection.Where(i => i.Week == week && i.Code == temp && i.PSI == PSI && i.So_May == somay_temp).Sum(i => i.Plan_D_ + i.Plan_N_).Value;
+                                                    sumkhbs = db.DA_Injection.Where(i => i.Week == week && i.Code == temp && i.PSI == PSI && i.So_May == somay_temp).Sum(i => i.Ke_Hoach_Bo_Sung).Value;
+                                                    balance = sumPlan - kehoachtemp - sumkhbs;
+                                                    string strbalance = String.Format("{0:n0}", balance);
+                                                }
+                                                @strbalance
+                                            </td>
+
+
+                                            <td colspan="2" style="text-align:center;font-weight:bold">
+                                                Total Good:<br />
+                                                @{
+                                                    var kq = db.DA_Injection.Where(i => i.Code == temp && i.Week == week && i.PSI == PSI && i.So_May == somay_temp).ToList();
+                                                    foreach (var k in kq)
+                                                    {
+                                                        if (k.Good_D_ != null)
+                                                        {
+                                                            sumGood += (int)k.Good_D_;
+                                                        }
+
+                                                        if (k.Good_N_ != null)
+                                                        {
+                                                            sumGood += (int)k.Good_N_;
+                                                        }
+                                                    }
+
+                                                    if (sumGood != -1)
+                                                    {
+                                                        sumGood += 1;
+                                                        strsumGood = String.Format("{0:n0}", sumGood);
+                                                    }
+                                                    else
+                                                    {
+                                                        strsumGood = "";
+                                                    }
+
+                                                }
+                                                @strsumGood
+                                            </td>
+
+
+                                            <td colspan="2" style="text-align:center;font-weight:bold;">
+                                                Total NG: <br />
+                                                @{
+                                                    foreach (var k in kq)
+                                                    {
+                                                        if (k.NG_D_ != null)
+                                                        {
+                                                            sumNotGood += (int)k.NG_D_;
+                                                        }
+
+                                                        if (k.NG_N_ != null)
+                                                        {
+                                                            sumNotGood += (int)k.NG_N_;
+                                                        }
+                                                    }
+
+                                                    if (sumNotGood != -1)
+                                                    {
+                                                        sumNotGood += 1;
+                                                        strsumNotGood = String.Format("{0:n0}", sumNotGood);
+                                                    }
+                                                    else
+                                                    {
+                                                        strsumNotGood = "";
+                                                    }
+                                                }
+                                                @strsumNotGood
+                                            </td>
+
+                                            <td colspan="2" style="text-align:center;font-weight:bold;">
+                                                %NG:<br />
+                                                @{
+                                                    double tongng = 0;
+                                                    if (sumGood != -1 && sumNotGood != -1)
+                                                    {
+                                                        tongng = (double)sumNotGood / (double)sumGood * 100;
+                                                        tongng = Math.Round(tongng, 1);
+                                                        string strtongng = tongng.ToString() + "%";
+                                                        @strtongng
+                                                    }
+                                                }
+                                            </td>
+
+                                            <td colspan="2"></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td colspan="24"></td>
+                                        </tr>
+                                    }
+                                }
+
+                                <tr>
+                                    @{
+                                        PSI = x.PSI;
+                                        somay_temp = x.So_May;
+                                        int tongplan = db.DA_Injection.Where(i => i.Code == code && i.Week == week && i.PSI == PSI && i.So_May == somay_temp).Sum(i => i.Plan_D_ + i.Plan_N_).Value;
+                                        int tonggood = 0;
+                                        var listsum = db.DA_Injection.Where(i => i.Code == code && i.Week == week && i.PSI == PSI && i.So_May == somay_temp).ToList();
+                                        if (listsum.Count > 0)
+                                        {
+                                            foreach (var k in listsum)
+                                            {
+                                                if (k.Good_D_ != null)
+                                                {
+                                                    tonggood += (int)k.Good_D_;
+                                                }
+
+                                                if (k.Good_N_ != null)
+                                                {
+                                                    tonggood += (int)k.Good_N_;
+                                                }
+                                            }
+                                        }
+
+                                        double ty_le = 0;
+                                        if (tongplan > 0)
+                                        {
+                                            ty_le = (double)tonggood / (double)tongplan * 100;
+                                        }
+
+                                        ty_le = Math.Round(ty_le, 1);
+                                        good_plan = ty_le;
+                                        double sumgood = 0;
+                                        double sumplan = 0;
+                                        if (x.Good_D_ != null)
+                                        {
+                                            sumgood += x.Good_D_;
+                                        }
+                                        if (x.Good_N_ != null)
+                                        {
+                                            sumgood += x.Good_N_;
+                                        }
+                                        if (x.Plan_D_ != null)
+                                        {
+                                            sumplan += x.Plan_D_;
+                                        }
+                                        if (x.Plan_N_ != null)
+                                        {
+                                            sumplan += x.Plan_N_;
+                                        }
+                                        if (sumplan > 0)
+                                        {
+                                            ty_le = sumgood / sumplan * 100;
+                                            ty_le = Math.Round(ty_le, 1);
+                                        }
+                                        else
+                                        {
+                                            ty_le = 0;
+                                        }
+                                        if (ty_le <= 10)
+                                        {
+                                            <td style="color:red;font-weight:bold">@ty_le% </td>
+                                        }
+                                        else if (ty_le > 10 && ty_le < 100)
+                                        {
+                                            <td style="font-weight:bold">@ty_le%</td>
+                                        }
+
+                                        if (ty_le >= 100)
+                                        {
+                                            ty_le = 100;
+                                            <td style="font-weight:bold">@ty_le%</td>
+                                        }
+                                    }
+                                    <td>
+                                        @{
+                                            DateTime datetemp = x.Date;
+                                            string strDate = datetemp.ToShortDateString();
+                                        }
+                                        @strDate
+                                    </td>
+
+                                    <td>@x.Code</td>
+
+                                    <td>@x.ItemName</td>
+
+                                    <td style="background-color:lightblue; font-weight:bold;text-align:center">@x.So_May</td>
+
+                                    <td>@x.Trong_Luong_May</td>
+
+                                    <td>
+                                        @{
+                                            string strkehoach = String.Format("{0:n0}", x.Ke_Hoach);
+                                        }
+                                        @strkehoach
+                                    </td>
+
+                                    @{
+                                        int somay = x.So_May;
+                                        string psi = x.PSI;
+                                        var khbs = db.DA_Injection.Where(i => i.Week == week && i.Code == code && i.Date == dateStart && i.So_May == somay && i.PSI == psi).FirstOrDefault();
+                                    }
+                                    <td>@khbs.Ke_Hoach_Bo_Sung</td>
+
+                                    <td>@x.Manpower</td>
+
+                                    <td>
+                                        @{
+                                            string strstock = String.Format("{0:n0}", x.Stock);
+                                        }
+                                        @strstock
+                                    </td>
+
+                                    <td>@x.Cycle_time</td>
+
+                                    <td>@x.Cavity</td>
+
+                                    <td>@x.Capa</td>
+
+                                    <td>@strDate</td>
+
+                                    <td style="background-color:darksalmon; font-weight:bold;text-align:center">
+                                        @{
+                                            tong_require += x.Requirements;
+                                        }
+                                        @x.Requirements
+                                    </td>
+
+                                    <td style="background-color:sandybrown; font-weight:bold;text-align:center" id="@x.ID_PlanTimeDem">
+                                        @{
+                                            double time = x.Plan_Time_D_;
+                                            var minute = time - Math.Floor(time);
+                                            minute = minute * 60;
+                                            var value_time = Math.Floor(time) + "h " + Math.Floor(minute) + "m";
+                                        }
+                                        @value_time
+                                    </td>
+
+                                    <td style="background-color:sandybrown; font-weight:bold;text-align:center" id="@x.ID_PlanDem">@x.Plan_D_</td>
+
+                                    <td style="background-color:sandybrown; font-weight:bold;text-align:center" id="@x.ID_PlanTimeNgay">
+                                        @{
+                                            time = x.C_Plan_Time_N_;
+                                            minute = time - Math.Floor(time);
+                                            minute = minute * 60;
+                                            value_time = Math.Floor(time) + "h " + Math.Floor(minute) + "m";
+                                        }
+                                        @value_time
+                                    </td>
+
+                                    <td style="background-color:sandybrown; font-weight:bold;text-align:center" id="@x.ID_PlanNgay">@x.Plan_N_</td>
+
+                                    <td>
+                                        @{
+                                            string strgooddem = "";
+                                            if (x.Good_D_ != null)
+                                            {
+                                                strgooddem = String.Format("{0:n0}", x.Good_D_);
+                                            }
+                                        }
+                                        @strgooddem
+                                    </td>
+
+                                    <td>
+                                        @{
+                                            string strgoodngay = "";
+                                            if (x.Good_N_ != null)
+                                            {
+                                                strgoodngay = String.Format("{0:n0}", x.Good_N_);
+                                            }
+                                        }
+                                        @strgoodngay
+                                    </td>
+
+                                    <td>
+                                        @{
+                                            string strNGD = "";
+                                            if (x.NG_D_ != null)
+                                            {
+                                                strNGD = String.Format("{0:n0}", x.NG_D_);
+                                            }
+                                        }
+                                        @strNGD
+                                    </td>
+
+                                    <td>
+                                        @{
+                                            string strNGN = "";
+                                            if (x.NG_N_ != null)
+                                            {
+                                                strNGN = String.Format("{0:n0}", x.NG_N_);
+                                            }
+                                        }
+                                        @strNGN
+                                    </td>
+
+                                    <td style="background-color:lightpink">
+                                        @{
+                                            if (x.NG_D_ != null && x.Good_D_ != null && x.Good_D_ > 0)
+                                            {
+                                                double ng = (double)x.NG_D_ / (double)x.Good_D_ * 100;
+                                                ng = Math.Round(ng, 1);
+                                                string strng = ng.ToString() + "%";
+                                                @strng
+                                            }
+                                        }
+                                    </td>
+
+                                    <td style="background-color:lightpink">
+                                        @{
+                                            if (x.NG_N_ != null && x.Good_N_ != null && x.Good_N_ > 0)
+                                            {
+                                                double ng = (double)x.NG_N_ / (double)x.Good_N_ * 100;
+                                                ng = Math.Round(ng, 1);
+                                                string strng = ng.ToString() + "%";
+                                                @strng
+                                            }
+                                        }
+                                    </td>
+
+                                    <td>@x.Code</td>
+
+                                    <td>@strDate</td>
+
+                                </tr>
+
+                                ngay = x.Date;
+                                temp = x.Code;
+                                kehoachtemp = x.Ke_Hoach;
+                                khbstemp = x.Ke_Hoach_Bo_Sung;
+                                somay_temp = x.So_May;
+                                trongluongtemp = x.Trong_Luong_May;
+                                capatemp = x.Capa;
+                                PSI = x.PSI;
+                            }
+
+
+                            <tr style="background-color:lightsalmon">
+                                @if (good_plan <= 10)
+                                {
+                                    <td style="background-color:red;font-weight:bold;color:white;border:none">@good_plan%</td>
+                                }
+                                else if (good_plan > 10 && good_plan < 100)
+                                {
+                                    <td style="background-color:yellow;font-weight:bold;border:none">@good_plan%</td>
+                                }
+
+                                @if (good_plan >= 100)
+                                {
+                                    good_plan = 100;
+                                    <td style="background-color:lawngreen;font-weight:bold;border:none">@good_plan%</td>
+                                }
+                                <td style="border:none"><div hidden>@temp</div></td>
+                                <td style="border:none"><div hidden>@somay_temp</div></td>
+                                <td style="border:none"><div hidden>@trongluongtemp</div></td>
+                                <td style="border:none"><div hidden>@capatemp</div></td>
+                                <td colspan="9" style="border-left:none"></td>
+                                <td style="text-align:center;font-weight:bold">
+                                    Total Requirements:
+                                    <br />
+                                    @tong_require
+                                    @{
+                                        tong_require = 0;
+                                    }
+                                </td>
+                                <td style="text-align:center;font-weight:bold" colspan="4">
+                                    Balance Plan:
+                                    @{
+                                        sumPlan = db.DA_Injection.Where(i => i.Week == week && i.Code == temp && i.PSI == PSI && i.So_May == somay_temp).Sum(i => i.Plan_D_ + i.Plan_N_).Value;
+                                        sumkhbs = db.DA_Injection.Where(i => i.Week == week && i.Code == temp && i.PSI == PSI && i.So_May == somay_temp).Sum(i => i.Ke_Hoach_Bo_Sung).Value;
+                                        balance = sumPlan - kehoachtemp - sumkhbs;
+                                        string strbalance2 = String.Format("{0:n0}", balance);
+                                    }
+                                    @strbalance2
+                                </td>
+                                <td colspan="2" style="text-align:center">
+                                    Total Good: <br />
+                                    @{
+                                        var kqq = db.DA_Injection.Where(i => i.Code == temp && i.Week == week && i.PSI == PSI).ToList();
+                                        sumGood = -1;
+                                        sumNotGood = -1;
+                                        strsumGood = "";
+                                        strsumNotGood = "";
+
+                                        foreach (var k in kqq)
+                                        {
+                                            if (k.Good_D_ != null)
+                                            {
+                                                sumGood += (int)k.Good_D_;
+                                            }
+
+                                            if (k.Good_N_ != null)
+                                            {
+                                                sumGood += (int)k.Good_N_;
+                                            }
+                                        }
+
+                                        if (sumGood != -1)
+                                        {
+                                            sumGood += 1;
+                                            strsumGood = String.Format("{0:n0}", sumGood);
+                                        }
+                                        else
+                                        {
+                                            strsumGood = "";
+                                        }
+                                    }
+                                    @strsumGood
+                                </td>
+                                <td colspan="2" style="text-align:center;font-weight:bold">
+                                    Total NG: <br />
+                                    @{
+                                        foreach (var k in kqq)
+                                        {
+                                            if (k.NG_D_ != null)
+                                            {
+                                                sumNotGood += (int)k.NG_D_;
+                                            }
+
+                                            if (k.NG_N_ != null)
+                                            {
+                                                sumNotGood += (int)k.NG_N_;
+                                            }
+                                        }
+
+                                        if (sumNotGood != -1)
+                                        {
+                                            sumNotGood += 1;
+                                            strsumNotGood = String.Format("{0:n0}", sumNotGood);
+                                        }
+                                        else
+                                        {
+                                            strsumNotGood = "";
+                                        }
+                                    }
+                                    @strsumNotGood
+                                </td>
+
+                                <td colspan="2" style="text-align:center;font-weight:bold;">
+                                    %NG:<br />
+                                    @{
+                                        double tongng2 = 0;
+                                        if (sumGood != -1 && sumNotGood != -1)
+                                        {
+                                            tongng2 = (double)sumNotGood / (double)sumGood * 100;
+                                            tongng2 = Math.Round(tongng2, 1);
+                                            string strtongng2 = tongng2.ToString() + "%";
+                                            @strtongng2
+                                        }
+                                    }
+                                </td>
+
+                                <td colspan="2"></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-table"></i>
+            Danh Sách Code Sản Xuất Thiếu
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr style="text-align:center">
+                            <th>Ngày</th>
+                            <th>Code</th>
+                            <th>Số Máy</th>
+                            <th>Số Thiếu Ca Ngày</th>
+                            <th>Số Thiếu Ca Đêm</th>
+                            <th>Tổng Số Thiếu</th>
+                            <th>Thời Gian Chạy Bổ Sung</th>
+                            <th>Máy Chạy Bổ Sung</th>
+                            <th>Thời Gian Trống</th>
+                            <th>Trạng Thái</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr style="text-align:center">
+                            <th>Ngày</th>
+                            <th>Code</th>
+                            <th>Số Máy</th>
+                            <th>Số Thiếu Ca Ngày</th>
+                            <th>Số Thiếu Ca Đêm</th>
+                            <th>Tổng Số Thiếu</th>
+                            <th>Thời Gian Chạy Bổ Sung</th>
+                            <th>Máy Chạy Bổ Sung</th>
+                            <th>Thời Gian Trống</th>
+                            <th>Trạng Thái</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @{
+                            if (ViewBag.KQSXThieu != null)
+                            {
+                                PlanEntities db = new PlanEntities();
+                                int iId = 0;
+                                foreach (var i in ViewBag.KQSXThieu)
+                                {
+                                    string strHtmlTimeBlank = "HtmlTimeBlank" + iId;
+                                    string strHtmlBtn = "HtmlBtn" + iId;
+                                    string strHtmlTrangThai = "HtmlTrangthai" + iId;
+                                    string HtmlBtn = "Html_Btn" + iId;
+                                    iId++;
+                                    DateTime tam = i.Date;
+                                    string date = tam.ToShortDateString();
+                                    <tr style="text-align:center;">
+                                        <td>
+                                            @date
+                                        </td>
+                                        <td>
+                                            @i.Code
+                                        </td>
+                                        <td>
+                                            @i.SoMay
+                                        </td>
+                                        <td style="background-color:sandybrown;font-weight:bold">
+                                            @{
+                                                if (i.FlagDem == false)
+                                                {
+                                                    @i.SoThieuCaDem
+                                                }
+                                            }
+                                        </td>
+                                        <td style="background-color:sandybrown;font-weight:bold">
+                                            @{
+                                                if (i.FlagNgay == false)
+                                                {
+                                                    @i.SoThieuCaNgay
+                                                }
+                                            }
+                                        </td>
+                                        <td style="background-color:darksalmon;font-weight:bold">
+                                            Tổng:<br />
+                                            @{
+                                                int tong = 0;
+                                                if (i.SoThieuCaDem != null)
+                                                {
+                                                    if (i.FlagDem == false)
+                                                    {
+                                                        tong += i.SoThieuCaDem;
+                                                    }
+                                                }
+
+                                                if (i.SoThieuCaNgay != null)
+                                                {
+                                                    if (i.FlagNgay == false)
+                                                    {
+                                                        tong += i.SoThieuCaNgay;
+                                                    }
+                                                }
+
+                                            }
+                                            @tong
+                                        </td>
+                                        <td>
+                                            @{
+                                                string code = i.Code;
+                                                double time = 0;
+                                                var rel = db.CodeLists.Where(x => x.Injection_Code == code).FirstOrDefault();
+                                                if (rel != null)
+                                                {
+                                                    var cycle = rel.Cycle_Time;
+                                                    cycle = cycle.Replace(".", ",");
+                                                    var capa = 3600 / Convert.ToDouble(cycle) * Convert.ToInt32(rel.Cavity);
+                                                    time = tong / capa;
+                                                    var minute = time - Math.Floor(time);
+                                                    minute = Math.Ceiling(minute * 60);
+                                                    string strTime = Math.Floor(time) + "h " + minute + "m";
+                                                    @strTime
+                                                }
+                                            }
+                                        </td>
+                                        <td>
+                                            @{
+                                                Plan.Controllers.JsonController JsonController = new Plan.Controllers.JsonController();
+
+                                                List<string> strList = new List<string>();
+                                                string week = ViewBag.Week;
+                                                var kq = db.DA_Injection.Where(x => x.Week == week).OrderBy(x => x.So_May).ToList();
+                                                var somaytemp = 0;
+                                                foreach (var k in kq)
+                                                {
+                                                    if (k.So_May != somaytemp)
+                                                    {
+                                                        double sum = 0;
+                                                        if (time > 0)
+                                                        {
+                                                            var resu = db.DA_Injection.Where(x => x.Week == week && x.Statuss == "true").FirstOrDefault();
+                                                            if (resu != null)
+                                                            {
+                                                                if (k.So_May == resu.So_May)
+                                                                {
+                                                                    double temp = 12 - Convert.ToDouble(resu.Plan_Time_D_);
+                                                                    sum = JsonController.SumTime_1May(Convert.ToInt32(k.So_May), week);
+                                                                    sum -= temp;
+                                                                }
+                                                                else
+                                                                {
+                                                                    sum = JsonController.SumTime_1May(Convert.ToInt32(k.So_May), week);
+                                                                }
+                                                            }
+
+                                                            if (time < sum)
+                                                            {
+                                                                strList.Add(Convert.ToString(k.So_May));
+                                                            }
+                                                        }
+                                                    }
+                                                    somaytemp = (int)k.So_May;
+                                                }
+
+                                                var res = db.DA_Injection.Where(x => x.Week == week && x.Statuss == "true").FirstOrDefault();
+                                                var somay_start = res.So_May;
+                                                var plantime = res.Plan_Time_D_;
+                                            }
+                                            <select onchange="GetTimeOption(this,'@i.PSI','@tong','@HtmlBtn','@date','@strHtmlTrangThai','@i.Code','@strHtmlBtn','@i.SoMay','@week','@strHtmlTimeBlank','@somay_start','@plantime')" style="border-radius: 5px; height: 40px;border: 1px solid #ced4da;width: 120px;outline: none;padding-left:10px;">
+                                                <option selected>Chọn Máy</option>
+                                                @{
+                                                    if (strList.Count > 0)
+                                                    {
+                                                        foreach (var k in strList)
+                                                        {
+                                                            <option style="text-align:center">
+                                                                @k
+                                                            </option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </td>
+
+                                        <td id="@strHtmlTimeBlank"></td>
+                                        <td id="@strHtmlTrangThai">
+                                            <span style="color:red;font-weight:bold">Chưa Lên Kế Hoạch Bổ Sung</span>
+                                        </td>
+
+                                        <td id="@HtmlBtn">
+                                            <input type="button" id="@strHtmlBtn" class="btn btn-success" value="OK" />
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+<script>
+    function GetTimeOption(maychaybosung,psi,kehoach,html_btn,strdate,htmltrangthai,code,htmlbtn,somay, week, htmltimeblank, somay_start, plantime) {
+        var getSoMay = maychaybosung.value;
+        $.ajax({
+            url: "/Json/GetTimeOption2",
+            data: {
+                somay: getSoMay,
+                week: week,
+                somay_start: somay_start,
+                plantime: plantime
+            },
+            dataType: "json",
+            type: "GET",
+            success: function (time) {
+                if (time != 0) {
+                    var minute;
+                    if (time <= 0) {
+                        time = 0;
+                        minute = 0;
+                    }
+                    else {
+                        minute = time - Math.floor(time);
+                        minute = minute * 60;
+                        minute = Math.floor(minute); 
+                    }
+                    var value_time = Math.floor(time) + 'h ' + minute + 'm';
+                    var html = '' + value_time + ''
+                    var get_id = document.getElementById(htmltimeblank);
+                    $(get_id).html(html)
+                }
+            }
+        });
+
+        var getId = document.getElementById(htmlbtn);
+        $(getId).off().click(function () {
+            EditPlan(code, week, getSoMay, htmltrangthai, strdate, html_btn, kehoach, psi, somay);
+        });
+    }
+
+    function EditPlan(code, week, maychaybosung, htmltrangthai, strdate, html_btn, kehoach, psi, somay) {
+      
+        $.ajax({
+            url: "/Json/EditPlan",
+            data: {
+                code: code,
+                week: week,
+                somay: somay,
+                strdate: strdate,
+                kehoach_edit: kehoach,
+                psi: psi,
+                maychaybosung: maychaybosung
+            },
+            dataType: "json",
+            type: "GET",
+            success: function (co) {
+                if (co == false) {
+                    var getId = document.getElementById(html_btn);
+                    var html = '<img src="../Content/Image/iconYes.png" />';
+                    $(getId).html(html);
+
+                    getId = document.getElementById(htmltrangthai);
+                    html = '<span style="font-weight:bold">Đã Lên Kế Hoạch Bổ Sung</span>';
+                    $(getId).html(html);
+
+                    var delayInMilliseconds = 700;
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, delayInMilliseconds);
+                   
+                    /*
+                    $.ajax({
+                        url: "/Json/GetCodeEdit",
+                        data: {
+                            week: week,
+                            somay: somay
+                        },
+                        dataType: "json",
+                        type: "GET",
+                        success: function (data) {
+                            if (data != null) {
+                                $.each(data, function (key, i) {
+                                    //hiển thị thời gian của ca ngày
+                                    if (i.Plan_Time_D_ > 0) {
+                                        var time = i.Plan_Time_D_;
+                                        var minute = time - Math.floor(time);
+                                        minute = minute * 60;
+                                        minute = Math.floor(minute); 
+                                        var value = Math.floor(time) + 'h ' + minute + 'm';
+                                        html = '' + value + '';
+                                        getId = document.getElementById(i.ID_PlanTimeDem)
+                                        $(getId).html(html)
+
+                                        var html = '' + i.Plan_D_ + '';
+                                        getId = document.getElementById(i.ID_PlanDem)
+                                        $(getId).html(html)
+
+                                        //hiển thị balance
+                                        html = '0'
+                                        getId = document.getElementById(i.ID_Balance)
+                                        $(getId).html(html)
+                                    }
+                                    else {
+                                        html = ''
+                                        getId = document.getElementById(i.ID_PlanTimeDem)
+                                        $(getId).html(html)
+
+                                        getId = document.getElementById(i.ID_PlanDem)
+                                        $(getId).html(html)
+
+                                        //hiển thị balance
+                                        html = '0'
+                                        getId = document.getElementById(i.ID_Balance)
+                                        $(getId).html(html)
+                                    }
+
+                                    if (i.C_Plan_Time_N_ > 0) {
+                                        //hiển thị thời gian của ca đêm
+                                        var time = i.C_Plan_Time_N_;
+                                        var minute = time - Math.floor(time);
+                                        minute = minute * 60;
+                                        minute = Math.floor(minute); 
+                                        var value = Math.floor(time) + 'h ' + minute + 'm';
+                                        html = '' + value + '';
+                                        getId = document.getElementById(i.ID_PlanTimeNgay)
+                                        $(getId).html(html)
+
+                                        //hiển sản lượng ca đêm
+                                        html = '' + i.Plan_N_ + '';
+                                        getId = document.getElementById(i.ID_PlanNgay)
+                                        $(getId).html(html)
+
+                                        //hiển thị balance
+                                        html = '0'
+                                        getId = document.getElementById(i.ID_Balance)
+                                        $(getId).html(html)
+                                    }
+                                    else {
+                                        html = ''
+                                        getId = document.getElementById(i.ID_PlanTimeNgay)
+                                        $(getId).html(html)
+
+                                        getId = document.getElementById(i.ID_PlanNgay)
+                                        $(getId).html(html)
+
+                                        //hiển thị balance
+                                        html = '0'
+                                        getId = document.getElementById(i.ID_Balance)
+                                        $(getId).html(html)
+                                    }
+                                })
+                            }
+                        }
+                    });*/
+                }
+                else {
+                    var cfmOverTime = document.querySelector("#cfmOverTime");
+                    cfmOverTime.showModal()
+                }
+            }
+        });
+    }
+
+    function Tim() {
+        var input = document.getElementById('myInput')
+        var mytable = document.getElementById('myTable')
+        var tag = mytable.getElementsByTagName('tr')
+        var value = $(input).val().toLowerCase();
+
+        $("#myTable tr").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    }
+
+    function CloseCfmOverTime() {
+        var cfmOverTime = document.querySelector("#cfmOverTime");
+        cfmOverTime.close();
+    }
+</script>
+
+<dialog id="cfmOverTime" style="text-align:center;border:none;font-weight:bold;border-radius:10px">
+    <span style="color:red">
+        Máy Này Không Đủ Thời Gian Để Lên Kế Hoạch!<br />
+        Vui Lòng Chọn Máy Khác!
+    </span>
+    <br />
+    <input type="button" class="btn btn-success" value="OK" onclick="CloseCfmOverTime()" />
+</dialog>

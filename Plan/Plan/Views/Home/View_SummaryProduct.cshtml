@@ -1,0 +1,383 @@
+﻿
+@{
+    ViewBag.Title = "View_SummaryProduct";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    #Table {
+        overflow-y: auto;
+        height: 650px;
+    }
+
+        #Table th {
+            position: sticky;
+            top: 0;
+        }
+
+    /* Just common table stuff. Really. */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        padding: 8px 16px;
+    }
+
+    th {
+        background-color: lightsalmon;
+    }
+
+
+    .edit {
+        border-radius: 5px;
+        height: 40px;
+        border: 1px solid #ced4da;
+        width: 100px;
+        text-align: center;
+        outline: none
+    }
+</style>
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Plan Resin Summary -- @ViewBag.Week (By Product)
+        <div style="float:right"><input id="myInput" type="text" placeholder="  Search.." onkeyup="Tim()" style="border-radius:5px;height:35px;border-color:darkgrey;box-shadow: 0 0 0 1pt lightblue;outline:none"></div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive" id="Table">
+
+            <table class="table table-bordered table-hover" id="" width="100%" cellspacing="0">
+                <thead>
+                    <tr style="text-align:center">
+                        <th>Code</th>
+                        <th>Mc</th>
+                        <th>Resin Code</th>
+                        <th>Resin</th>
+                        <th>Mix Rate</th>
+                        <th>Net Weight<br />(g)</th>
+                        <th>Total Plan</th>
+                        @{ 
+                            if(ViewBag.dateStart != null && ViewBag.dateEnd != null)
+                            {
+                                DateTime n = ViewBag.dateEnd;
+                                for (DateTime i = ViewBag.dateStart; i <= n; i = i.AddDays(1))
+                                {
+                                    string strdate = String.Format("{0:dd-MMMM}", i);
+                                    <th style="background-color:lightskyblue">@strdate</th>
+                                }
+                            }
+                        }
+                    </tr>
+                </thead>
+                <tfoot>
+                </tfoot>
+                <tbody id="myTable">
+                    @if (ViewBag.Plan != null)
+                    {
+                        PlanEntities db = new PlanEntities();
+
+                        string week = ViewBag.Week;
+                        string codetemp = "";
+
+                        var check = db.SummaryByProducts.FirstOrDefault(x => x.Week == week);
+
+                        foreach (DA_Injection i in ViewBag.Plan)
+                        {
+                            if (i.Code != codetemp)
+                            {
+                                SummaryByProduct sm = new SummaryByProduct();
+
+                                codetemp = i.Code;
+                                var kq = db.CodeLists.Where(x => x.Injection_Code == i.Code || x.Another_Code == i.Code).FirstOrDefault();
+                                kq.Weight = kq.Weight.Replace(".", ",");
+                                int index = kq.Resin_Code.IndexOf("\n");
+
+                                if (index != -1)
+                                {
+                                    string[] arrListStr = kq.Resin_Code.Split('\n');
+                                    <tr style="text-align:center">
+                                        <td>
+                                            @i.Code
+                                        </td>
+
+                                        <td>
+                                            @i.So_May
+                                        </td>
+
+                                        <td>
+                                            @arrListStr[0]
+                                        </td>
+
+                                        <td>
+                                        @{
+                                        if (kq != null)
+                                        {
+                                            @kq.Resin
+                                            }
+                                    }
+                                        </td>
+
+                                        <td>
+                                            0,96
+                                        </td>
+
+                                        <td>
+                                        @{
+                                        if (kq != null)
+                                        {
+                                            @kq.Weight
+                                            }
+                                    }
+                                        </td>
+                                        @{
+                                        sm.Code = i.Code;
+                                        sm.Mc = i.So_May;
+                                        sm.ResinCode = arrListStr[0];
+                                        sm.MixRate = 0.96;
+                                        if (kq != null)
+                                        {
+                                            sm.Resin = kq.Resin;
+                                            sm.NetWeight = Convert.ToDouble(kq.Weight);
+                                        }
+                                    }
+                                        <td style="background-color:cornflowerblue">
+                                            @{
+                                        int tong = 0;
+                                        foreach (DA_Injection k in ViewBag.Plan)
+                                        {
+                                            if (k.Code == i.Code && k.PSI == i.PSI && k.So_May == i.So_May)
+                                            {
+                                                double sum = Convert.ToDouble(k.Plan_D_ + k.Plan_N_);
+                                                sum = Math.Ceiling(sum * Convert.ToDouble(kq.Weight) * 0.96);
+                                                tong += (int)sum;
+                                            }
+                                        }
+                                        string strsum = String.Format("{0:n0}", tong);
+                                        @strsum
+                                            }
+                                        </td>
+
+                                        @{
+                                        foreach (DA_Injection k in ViewBag.Plan)
+                                        {
+                                            if (k.Code == i.Code && k.PSI == i.PSI && k.So_May == i.So_May)
+                                            {
+                                                double sum = Convert.ToDouble(k.Plan_D_ + k.Plan_N_);
+                                                sum = Math.Ceiling(sum * Convert.ToDouble(kq.Weight) * 0.96);
+                                                strsum = String.Format("{0:n0}", sum);
+
+                                                sm.Date = k.Date;
+                                                sm.SoLuong = (int)sum;
+                                                sm.Week = week;
+
+                                                if(check == null)
+                                                {
+                                                    db.SummaryByProducts.Add(sm);
+                                                    db.SaveChanges();
+                                                }
+                                                    <td>@strsum</td>
+                                            }
+                                        }
+                                    }
+                                    </tr>
+
+                                    <tr style="text-align:center">
+                                        <td style="background-color:yellow;">
+                                            @i.Code
+                                        </td>
+
+                                        <td style="background-color:yellow;">
+                                            @i.So_May
+                                        </td>
+
+                                        <td style="background-color:yellow;">
+                                            @arrListStr[1]
+                                        </td>
+
+                                        <td style="background-color:yellow;">
+
+                                        </td>
+
+                                        <td style="background-color:yellow;">
+                                            0,04
+                                        </td>
+
+                                        <td style="background-color:yellow;">
+                                            @{
+                                        if (kq != null)
+                                        {
+                                            @kq.Weight
+                                                }
+                                    }
+                                        </td>
+
+                                        @{
+                                        sm.Code = i.Code;
+                                        sm.Mc = i.So_May;
+                                        sm.ResinCode = arrListStr[1];
+                                        sm.MixRate = 0.04;
+                                        if (kq != null)
+                                        {
+                                            sm.NetWeight = Convert.ToDouble(kq.Weight);
+                                        }
+                                    }
+
+                                        <td style="background-color:cornflowerblue">
+                                            @{
+                                        tong = 0;
+                                        foreach (DA_Injection k in ViewBag.Plan)
+                                        {
+                                            if (k.Code == i.Code && k.PSI == i.PSI && k.So_May == i.So_May)
+                                            {
+                                                double sum = Convert.ToDouble(k.Plan_D_ + k.Plan_N_);
+                                                sum = Math.Ceiling(sum * Convert.ToDouble(kq.Weight) * 0.04);
+                                                tong += (int)sum;
+                                            }
+                                        }
+                                        strsum = String.Format("{0:n0}", tong);
+                                        @strsum
+                                            }
+                                        </td>
+
+                                        @{
+                                        foreach (DA_Injection k in ViewBag.Plan)
+                                        {
+                                            if (k.Code == i.Code && k.PSI == i.PSI && k.So_May == i.So_May)
+                                            {
+                                                double sum = Convert.ToDouble(k.Plan_D_ + k.Plan_N_);
+                                                sum = Math.Ceiling(sum * Convert.ToDouble(kq.Weight) * 0.04);
+                                                strsum = String.Format("{0:n0}", sum);
+
+                                                sm.Date = k.Date;
+                                                sm.SoLuong = (int)sum;
+                                                sm.Week = week;
+                                                if(check == null)
+                                                {
+                                                    db.SummaryByProducts.Add(sm);
+                                                    db.SaveChanges();
+                                                }
+
+                                                    <td>@strsum</td>
+                                            }
+                                        }
+                                    }
+                                    </tr>
+                                }
+                                else
+                                {
+                                    <tr style="text-align:center">
+                                        <td>
+                                            @i.Code
+                                        </td>
+
+                                        <td>
+                                            @i.So_May
+                                        </td>
+
+                                        <td>
+                                            @{
+                                        if (kq != null)
+                                        {
+                                            @kq.Resin_Code
+                                                }
+                                    }
+                                        </td>
+
+                                        <td>
+                                            @{
+                                        if (kq != null)
+                                        {
+                                            @kq.Resin
+                                                }
+                                    }
+                                        </td>
+
+                                        <td>
+                                            1
+                                        </td>
+
+                                        <td>
+                                            @{
+                                        if (kq != null)
+                                        {
+                                            @kq.Weight
+                                                }
+                                    }
+                                        </td>
+
+                                        @{
+                                        sm.Code = i.Code;
+                                        sm.Mc = i.So_May;
+                                        sm.MixRate = 1;
+                                        if (kq != null)
+                                        {
+                                            sm.Resin = kq.Resin;
+                                            sm.ResinCode = kq.Resin_Code;
+                                            sm.NetWeight = Convert.ToDouble(kq.Weight);
+                                        }
+                                    }
+
+                                        <td style="background-color:cornflowerblue">
+                                            @{
+                                        int tong = 0;
+                                        foreach (DA_Injection k in ViewBag.Plan)
+                                        {
+                                            if (k.Code == i.Code && k.PSI == i.PSI && k.So_May == i.So_May)
+                                            {
+                                                double sum = Convert.ToDouble(k.Plan_D_ + k.Plan_N_);
+                                                sum = Math.Ceiling(sum * Convert.ToDouble(kq.Weight));
+                                                tong += (int)sum;
+                                            }
+                                        }
+                                        string strsum = String.Format("{0:n0}", tong);
+                                        @strsum
+                                            }
+                                        </td>
+
+                                    @{
+                                        foreach (DA_Injection k in ViewBag.Plan)
+                                        {
+                                            if (k.Code == i.Code && k.PSI == i.PSI && k.So_May == i.So_May)
+                                            {
+                                                double sum = Convert.ToDouble(k.Plan_D_ + k.Plan_N_);
+                                                sum = Math.Ceiling(sum * Convert.ToDouble(kq.Weight));
+                                                strsum = String.Format("{0:n0}", sum);
+
+                                                sm.Date = k.Date;
+                                                sm.SoLuong = (int)sum;
+                                                sm.Week = week;
+                                                if(check == null)
+                                                {
+                                                    db.SummaryByProducts.Add(sm);
+                                                    db.SaveChanges();
+                                                }
+
+                                                    <td>@strsum</td>
+                                            }
+                                        }
+                                    }
+                                    </tr>
+                                }
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+<script>
+    function Tim() {
+        var input = document.getElementById('myInput')
+        var mytable = document.getElementById('myTable')
+        var tag = mytable.getElementsByTagName('tr')
+        var value = $(input).val().toLowerCase();
+
+        $("#myTable tr").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    }
+</script>

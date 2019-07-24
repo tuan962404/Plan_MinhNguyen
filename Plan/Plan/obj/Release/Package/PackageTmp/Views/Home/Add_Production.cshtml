@@ -1,0 +1,313 @@
+﻿
+@{
+    ViewBag.Title = "Add_Production";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    DateTime date_temp = ViewBag.Date;
+    var date = String.Format("{0:yyyy-MM-dd}", date_temp);
+}
+
+<style>
+    .edit {
+        border-radius: 5px;
+        height: 40px;
+        border: 1px solid #ced4da;
+        width: 150px;
+        text-align: center;
+        outline: none
+    }
+</style>
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    @*<ol class="breadcrumb">
+            <form action="/Home/View_Product_Result" method="post">
+                <h3 style="color:red">Chọn Ngày Nhập</h3>
+                <br />
+                <input type="date" ng-model="Date" name="date" required class="form-control" />
+                <br />
+                <input type="submit" class="btn btn-danger" value="OK" />
+            </form>
+        </ol>*@
+    <!-- DataTables Example -->
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-table"></i>
+            Nhập Kết Quả Sản Xuất
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr style="text-align:center">
+                            <th>Date</th>
+                            <th>Code</th>
+                            <th>Số Máy</th>
+                            <th>Plan(Day)</th>
+                            <th>Good (Shift1)</th>
+                            <th>Not Good (Shift1)</th>
+                            <th>Plan(Night)</th>
+                            <th>Good (Shift3)</th>
+                            <th>Not Good (Shift3)</th>
+                            <th>Add</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr style="text-align:center">
+                            <th>Date</th>
+                            <th>Code</th>
+                            <th>Số Máy</th>
+                            <th>Plan(Day)</th>
+                            <th>Good (Shift1)</th>
+                            <th>Not Good (Shift1)</th>
+                            <th>Plan(Night)</th>
+                            <th>Good (Shift3)</th>
+                            <th>Not Good (Shift3)</th>
+                            <th>Add</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @{
+                            int Id_Code = 0;
+                            int Id_Good_S1 = 0;
+                            int Id_Good_S2 = 0;
+                            int Id_NGood_S1 = 0;
+                            int Id_NGood_S2 = 0;
+                            int class_btn = 0;
+                            int iconYesSo = 0;
+                        }
+                        @if (ViewBag.Plan != null)
+                        {
+                            PlanEntities db = new PlanEntities();
+
+                            foreach (var i in ViewBag.Plan)
+                            {
+                                Id_Code++;
+                                Id_Good_S1++;
+                                Id_Good_S2++;
+                                Id_NGood_S1++;
+                                Id_NGood_S2++;
+                                class_btn++;
+                                iconYesSo++;
+
+                                string strId_Code = "Code" + Convert.ToString(Id_Code); ;
+                                string strId_Good_S1 = "Good(s1)" + Convert.ToString(Id_Good_S1);
+                                string strId_Good_S2 = "Good(s2)" + Convert.ToString(Id_Good_S2);
+                                string strId_NGood_S1 = "NGood(s1)" + Convert.ToString(Id_NGood_S1);
+                                string strId_NGood_S2 = "NGood(s2)" + Convert.ToString(Id_NGood_S2);
+                                string strBtn = "btn" + Convert.ToString(class_btn);
+                                string striconYes = "iconYes" + Convert.ToString(iconYesSo);
+                                <tr style="text-align:center">
+                                    <td>
+                                        @{ 
+                                            string strDate = date_temp.ToShortDateString();
+                                        }
+                                        <input type="text" id="date" ng-model="Date" name="date" value="@strDate" readonly class="edit" />
+                                    </td>
+
+                                    <td>
+                                        <div hidden>@i.Code</div>
+                                        <input type="text" id="@strId_Code" name="code" class="edit" value="@i.Code" readonly />
+                                    </td>
+
+                                    <td>
+                                        <div hidden>@i.So_May</div>
+                                        <input type="text" class="form-control" value="@i.So_May" readonly style="background-color:yellow;text-align:center"/>
+                                    </td>
+
+                                    <td style="font-weight:bold;background-color:lightskyblue">
+                                        @i.Plan_D_
+                                    </td>
+
+                                    <td>
+                                        @{
+                                            string code = i.Code;
+                                            string psi = i.PSI;
+                                            int somay = i.So_May;
+                                            DateTime datetemp = i.Date;
+                                            var rel = db.KetQuaSanXuatThieux.FirstOrDefault(x => x.Code == code && x.PSI == psi && x.SoMay == somay && x.Date == datetemp);
+
+                                            if (rel != null)
+                                            {
+                                                if (rel.FlagDem == true)
+                                                {
+                                                    <input type="text" id="@strId_Good_S1" value="@i.Good_D_" name="good(s1)" readonly class="edit" required onkeyup="CfmEdit()" />
+                                                }
+                                                else
+                                                {
+                                                    <input type="text" id="@strId_Good_S1" value="@i.Good_D_" name="good(s1)" class="edit" required />
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <input type="text" id="@strId_Good_S1" value="@i.Good_D_" name="good(s1)" class="edit" required />
+                                            }
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <input type="text" id="@strId_NGood_S1" value="@i.NG_D_" name="ng(s1)" class="edit" />
+                                    </td>
+
+                                    <td style="font-weight:bold;background-color:lightskyblue">
+                                        @i.Plan_N_
+                                    </td>
+
+                                    <td>
+                                        @{
+                                            if (rel != null)
+                                            {
+                                                if (rel.FlagNgay == true)
+                                                {
+                                                    <input type="text" id="@strId_Good_S2" value="@i.Good_N_" name="good(s2)" class="edit" readonly onkeyup="CfmEdit()" />
+                                                }
+                                                else
+                                                {
+                                                    <input type="text" id="@strId_Good_S2" value="@i.Good_N_" name="good(s2)" class="edit" />
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <input type="text" id="@strId_Good_S2" value="@i.Good_N_" name="good(s2)" class="edit" />
+                                            }
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <input type="text" id="@strId_NGood_S2" value="@i.NG_N_" name="ng(s2)" class="edit" />
+                                       
+                                    </td>
+
+                                    <td>
+                                        <input type="button" id="btn" name="@strBtn" class="btn btn-danger" value="Nhập" onclick="AddProduct('@i.So_May','@i.Week','@i.Plan_D_','@i.Plan_N_','date','@strId_Code','@strId_Good_S1','@strId_Good_S2','@strId_NGood_S1','@strId_NGood_S2','@strBtn','@striconYes','@i.PSI')" />
+                                        <div name="@striconYes"></div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer small text-muted"></div>
+    </div>
+    <p class="small text-center text-muted my-5">
+
+    </p>
+</div>
+
+
+<script type="text/javascript">
+    function AddProduct(somay,week,plandem,planngay,date, code, goods1, goods2, ngoods1, ngoods2, strBtn, striconYes,psi) {
+        var idDate = document.getElementById(date)
+        var idCode = document.getElementById(code)
+        var idGoods1 = document.getElementById(goods1)
+        var idGoods2 = document.getElementById(goods2)
+        var idNGoods1 = document.getElementById(ngoods1)
+        var idNGoods2 = document.getElementById(ngoods2)
+        var btn = document.getElementsByName(strBtn)
+        var iconYes = document.getElementsByName(striconYes)
+        var confirm_format = document.getElementById('confirm_format')
+        var confirm_rong = document.getElementById('confirm_rong')
+        var confirm_overplan = document.getElementById('confirm_overplan')
+     
+        var getDate = idDate.value
+        var getCode = idCode.value
+        var getGoods1 = idGoods1.value
+        var getGoods2 = idGoods2.value
+        var getNGoods1 = idNGoods1.value
+        var getNGoods2 = idNGoods2.value
+    
+        var regx = new RegExp('[a-zA-Z\d+\.?\d|\.\d]')
+        if (regx.test(getGoods1) == true || regx.test(getGoods2) == true || regx.test(getNGoods1) == true || regx.test(getNGoods2) == true) {
+            confirm_format.showModal()
+        }
+        else {
+            if (getGoods1 > plandem) {
+                confirm_overplan.showModal()
+            }
+            else if (getGoods2 > planngay) {
+                confirm_overplan.showModal()
+            }
+            else {
+                $.ajax({
+                    url: "/Home/Add_Product",
+                    data: {
+                        strdate: getDate,
+                        code: getCode,
+                        strgoods1: getGoods1,
+                        strgoods2: getGoods2,
+                        strngoods1: getNGoods1,
+                        strngoods2: getNGoods2,
+                        psi: psi,
+                        week: week,
+                        somay: somay
+                    },
+                    dataType: "json",
+                    type: "GET",
+                    success: function (flag) {
+                        if (flag == true) {
+                            $(btn).hide()
+                            var html = '<img src="../Content/Image/iconYes.png" />'
+                            $(iconYes).html(html)
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    function Exit_Rong() {
+        var confirm_rong = document.getElementById('confirm_rong')
+        confirm_rong.close()
+    }
+
+    function Exit_Format() {
+        var confirm_format = document.getElementById('confirm_format')
+        confirm_format.close()
+    }
+
+    function CfmEdit() {
+        var confirm_edit = document.getElementById('confirm_edit')
+        confirm_edit.showModal();
+    }
+
+    function Exit_CfmEdit() {
+        var confirm_edit = document.getElementById('confirm_edit')
+        confirm_edit.close()
+    }
+
+    function Exit_Over() {
+        var confirm_overplan = document.getElementById('confirm_overplan')
+        confirm_overplan.close()
+    }
+</script>
+
+<dialog id="confirm_rong" style="border:none;border-radius:5px;text-align:center">
+    <lable style="color:red">Vui lòng điền đủ thông tin</lable> &nbsp;
+    <br />
+    <br />
+    <button class="btn btn-success" onclick="Exit_Rong()">OK</button>
+</dialog>
+
+<dialog id="confirm_format" style="border:none;border-radius:5px;text-align:center">
+    <lable style="color:red">Dữ liệu phải là số nguyên</lable>&nbsp;
+    <br />
+    <br />
+    <button class="btn btn-success" onclick="Exit_Format()">OK</button>
+</dialog>
+
+<dialog id="confirm_overplan" style="border:none;border-radius:5px;text-align:center">
+    <lable style="color:red">Kết quả sản xuất không được phép nhập vượt quá kế hoạch!<br />Vui lòng liên hệ trưởng bộ phận để được hỗ trợ</lable> &nbsp;
+    <br />
+    <br />
+    <button class="btn btn-success" onclick="Exit_Over()">OK</button>
+</dialog>
+
+<dialog id="confirm_edit" style="border:none;border-radius:5px;text-align:center">
+    <lable style="color:red">Số liệu này không được phép thay đổi!</lable> &nbsp;
+    <br />
+    <br />
+    <button class="btn btn-success" onclick="Exit_CfmEdit()">OK</button>
+</dialog>

@@ -1,0 +1,27 @@
+﻿
+@{
+    ViewBag.Title = "UpdateMailServer";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model MailServer
+<div class="container">
+    <div class="card card-login mx-auto mt-5">
+        <div class="card-header" style="text-align:center">Cập Nhật Email Server</div>
+        <div class="card-body">
+            <div class="text-center mb-4">
+                <h4>Nhập Email Server Hiện Tại</h4>
+            </div>
+            <form action="/Account/UpdateMailServer" method="post" autocomplete="off">
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    <input type="email" id="inputEmail" class="form-control" placeholder="Enter Email Current" required="required" autofocus="autofocus" ng-model="Email" name="Email">
+                    <br />
+                    <input type="password" id="inputEmail" class="form-control" placeholder="Enter Password" required="required" autofocus="autofocus" ng-model="Password" name="Password">
+                </div>
+                <input type="submit" class="btn btn-primary btn-block" value="Tiếp tục" />
+            </form>
+        </div>
+    </div>
+</div>
+

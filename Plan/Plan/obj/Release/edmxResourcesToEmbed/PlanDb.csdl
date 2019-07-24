@@ -1,0 +1,362 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="PlanModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityContainer Name="PlanEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="PicklistVatTus" EntityType="PlanModel.PicklistVatTu" />
+    <EntitySet Name="Stocks" EntityType="PlanModel.Stock" />
+    <EntitySet Name="Assy_PSI_Shortage" EntityType="PlanModel.Assy_PSI_Shortage" />
+    <EntitySet Name="PSI_WM_REF" EntityType="PlanModel.PSI_WM_REF" />
+    <EntitySet Name="Production_Result" EntityType="PlanModel.Production_Result" />
+    <FunctionImport Name="Delete_Stock" />
+    <FunctionImport Name="SumAssy" ReturnType="Collection(Int32)">
+      <Parameter Name="code" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="Sum_Require_Assy" ReturnType="Collection(Int32)">
+      <Parameter Name="code_assy" Mode="In" Type="String" />
+      <Parameter Name="dateStart" Mode="In" Type="DateTime" />
+      <Parameter Name="dateEnd" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="Sum_Require_VC" ReturnType="Collection(Int32)">
+      <Parameter Name="code_assy" Mode="In" Type="String" />
+      <Parameter Name="dateStart" Mode="In" Type="DateTime" />
+      <Parameter Name="dateEnd" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="Sum_Require_Ref" ReturnType="Collection(Int32)">
+      <Parameter Name="code_assy" Mode="In" Type="String" />
+      <Parameter Name="dateStart" Mode="In" Type="DateTime" />
+      <Parameter Name="dateEnd" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <EntitySet Name="Plan_Week" EntityType="PlanModel.Plan_Week" />
+    <FunctionImport Name="Sum_Require_DA" ReturnType="Collection(Int32)">
+      <Parameter Name="code_assy" Mode="In" Type="String" />
+      <Parameter Name="week" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="Sum_PLD_DA" ReturnType="Collection(Int32)">
+      <Parameter Name="code_assy" Mode="In" Type="String" />
+      <Parameter Name="week" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="Sum_PLN_DA" ReturnType="Collection(Int32)">
+      <Parameter Name="code_assy" Mode="In" Type="String" />
+      <Parameter Name="week" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="GetViewPlan" ReturnType="Collection(PlanModel.GetViewPlan_Result)">
+      <Parameter Name="week" Mode="In" Type="String" />
+      <Parameter Name="status" Mode="In" Type="String" />
+    </FunctionImport>
+    <EntitySet Name="KetQuaSanXuatThieux" EntityType="PlanModel.KetQuaSanXuatThieu" />
+    <EntitySet Name="ResinStocks" EntityType="PlanModel.ResinStock" />
+    <FunctionImport Name="Delete_ResinStock" />
+    <EntitySet Name="SummaryByProducts" EntityType="PlanModel.SummaryByProduct" />
+    <EntitySet Name="Credentials" EntityType="PlanModel.Credential" />
+    <EntitySet Name="UserGroups" EntityType="PlanModel.UserGroup" />
+    <EntitySet Name="Roles" EntityType="PlanModel.Role" />
+    <EntitySet Name="Domains" EntityType="PlanModel.Domain" />
+    <EntitySet Name="MailServers" EntityType="PlanModel.MailServer" />
+    <EntitySet Name="Users" EntityType="PlanModel.User" />
+    <EntitySet Name="MailVerifies" EntityType="PlanModel.MailVerify" />
+    <EntitySet Name="CodeLists" EntityType="PlanModel.CodeList" />
+    <EntitySet Name="DA_Injection" EntityType="PlanModel.DA_Injection" />
+    <EntitySet Name="PSI_V_C" EntityType="PlanModel.PSI_V_C" />
+  </EntityContainer>
+  <EntityType Name="PicklistVatTu">
+    <Key>
+      <PropertyRef Name="STT" />
+    </Key>
+    <Property Name="STT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Injection_Code" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Machine_No_" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Machine" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Cycle_Time" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Cavity" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Manpower" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Resin" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Resin_Code" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Weight" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Vat_Tu_Code" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Ten_Vat_Tu" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Ty_Le" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Another_Code" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="Stock">
+    <Key>
+      <PropertyRef Name="STT" />
+    </Key>
+    <Property Name="Code" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Stock1" Type="Int32" />
+    <Property Name="STT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+  </EntityType>
+  <EntityType Name="Assy_PSI_Shortage">
+    <Key>
+      <PropertyRef Name="STT" />
+    </Key>
+    <Property Name="STT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Code" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Date" Type="DateTime" Precision="0" />
+    <Property Name="Requirement" Type="Int32" />
+  </EntityType>
+  <EntityType Name="PSI_WM_REF">
+    <Key>
+      <PropertyRef Name="STT" />
+    </Key>
+    <Property Name="Code" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Description" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Date" Type="DateTime" Precision="0" />
+    <Property Name="Requirements" Type="Int32" />
+    <Property Name="STT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Balace_Stock_" Type="Int32" />
+  </EntityType>
+  <EntityType Name="Production_Result">
+    <Key>
+      <PropertyRef Name="STT" />
+    </Key>
+    <Property Name="Code" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Date" Type="DateTime" Precision="0" />
+    <Property Name="Shift1_G_" Type="Int32" />
+    <Property Name="Shift2_G_" Type="Int32" />
+    <Property Name="Shift1_NG_" Type="Int32" />
+    <Property Name="Shift2_NG_" Type="Int32" />
+    <Property Name="STT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+  </EntityType>
+  <EntityType Name="Plan_Week">
+    <Key>
+      <PropertyRef Name="STT" />
+    </Key>
+    <Property Name="STT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="DateStart" Type="DateTime" Precision="0" />
+    <Property Name="DateEnd" Type="DateTime" Precision="0" />
+    <Property Name="Week" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <ComplexType Name="GetViewPlan_Result">
+    <Property Type="Int32" Name="No_" Nullable="false" />
+    <Property Type="String" Name="Code" Nullable="true" MaxLength="200" />
+    <Property Type="Int32" Name="So_May" Nullable="true" />
+    <Property Type="Int32" Name="Trong_Luong_May" Nullable="true" />
+    <Property Type="Double" Name="C_Good" Nullable="true" />
+    <Property Type="Int32" Name="Ke_Hoach" Nullable="true" />
+    <Property Type="Int32" Name="Ke_Hoach_Bo_Sung" Nullable="true" />
+    <Property Type="Double" Name="Manpower" Nullable="true" />
+    <Property Type="Int32" Name="Stock" Nullable="true" />
+    <Property Type="Double" Name="Cycle_time" Nullable="true" />
+    <Property Type="Int32" Name="Cavity" Nullable="true" />
+    <Property Type="Double" Name="Capa" Nullable="true" />
+    <Property Type="Int32" Name="Balance_Plan" Nullable="true" />
+    <Property Type="DateTime" Name="Date" Nullable="true" />
+    <Property Type="Int32" Name="Requirements" Nullable="true" />
+    <Property Type="Double" Name="Plan_Time_D_" Nullable="true" />
+    <Property Type="Int32" Name="Plan_D_" Nullable="true" />
+    <Property Type="Int32" Name="Good_D_" Nullable="true" />
+    <Property Type="Int32" Name="NG_D_" Nullable="true" />
+    <Property Type="Double" Name="C_NG" Nullable="true" />
+    <Property Type="Double" Name="C_Plan_Time_N_" Nullable="true" />
+    <Property Type="Int32" Name="Plan_N_" Nullable="true" />
+    <Property Type="Int32" Name="Good_N_" Nullable="true" />
+    <Property Type="Int32" Name="NG_N_" Nullable="true" />
+    <Property Type="DateTime" Name="Date_End" Nullable="true" />
+    <Property Type="String" Name="Week" Nullable="true" MaxLength="200" />
+    <Property Type="String" Name="ID_PlanTimeDem" Nullable="true" MaxLength="200" />
+    <Property Type="String" Name="ID_PlanTimeNgay" Nullable="true" MaxLength="200" />
+    <Property Type="String" Name="PSI" Nullable="true" MaxLength="200" />
+    <Property Type="String" Name="Statuss" Nullable="true" MaxLength="200" />
+    <Property Type="Int32" Name="plandemtemp" Nullable="true" />
+    <Property Type="Double" Name="plantimedemtemp" Nullable="true" />
+    <Property Type="Int32" Name="planngaytemp" Nullable="true" />
+    <Property Type="Double" Name="plantimengaytemp" Nullable="true" />
+  </ComplexType>
+  <EntityType Name="KetQuaSanXuatThieu">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Code" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Date" Type="DateTime" Precision="0" />
+    <Property Name="SoThieuCaDem" Type="Int32" />
+    <Property Name="SoThieuCaNgay" Type="Int32" />
+    <Property Name="SoMay" Type="Int32" />
+    <Property Name="Week" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="PSI" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="FlagDem" Type="Boolean" />
+    <Property Name="FlagNgay" Type="Boolean" />
+  </EntityType>
+  <EntityType Name="ResinStock">
+    <Key>
+      <PropertyRef Name="STT" />
+    </Key>
+    <Property Name="STT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Code" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="ResinStock1" Type="Int32" />
+  </EntityType>
+  <EntityType Name="SummaryByProduct">
+    <Key>
+      <PropertyRef Name="STT" />
+    </Key>
+    <Property Name="STT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Code" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Date" Type="DateTime" Precision="0" />
+    <Property Name="SoLuong" Type="Int32" />
+    <Property Name="Mc" Type="Int32" />
+    <Property Name="ResinCode" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Resin" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="MixRate" Type="Double" />
+    <Property Name="NetWeight" Type="Double" />
+    <Property Name="Week" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="Credential">
+    <Key>
+      <PropertyRef Name="UserGroupID" />
+      <PropertyRef Name="RoleID" />
+    </Key>
+    <Property Name="UserGroupID" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="RoleID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="UserGroup">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="Role">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="Domain">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Domain1" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="MailServer">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Email" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Password" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="User">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="User1" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Password" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="FullName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="BoPhan" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="NumberPhone" Type="Int32" />
+    <Property Name="Email" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Status" Type="Boolean" />
+    <Property Name="GroupID" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="VIEW_USER" Type="Boolean" />
+    <Property Name="LAP_KEHOACH" Type="Boolean" />
+    <Property Name="EDIT_KEHOACH" Type="Boolean" />
+    <Property Name="XUAT_EXCEL" Type="Boolean" />
+    <Property Name="ADD_STOCK" Type="Boolean" />
+    <Property Name="DELETE_STOCK" Type="Boolean" />
+    <Property Name="ADD_RESINSTOCK" Type="Boolean" />
+    <Property Name="DELETE_RESINSTOCK" Type="Boolean" />
+    <Property Name="EDIT_STOCK" Type="Boolean" />
+    <Property Name="EDIT_RESINSTOCK" Type="Boolean" />
+    <Property Name="EDIT_KQSX" Type="Boolean" />
+    <Property Name="NHAP_KQSX" Type="Boolean" />
+    <Property Name="ADD_CODELIST" Type="Boolean" />
+    <Property Name="ADD_PICKLISTVATTU" Type="Boolean" />
+    <Property Name="IMPORT_PSI" Type="Boolean" />
+    <Property Name="IMPORT_STOCK" Type="Boolean" />
+    <Property Name="IMPORT_RESINSTOCK" Type="Boolean" />
+    <Property Name="EDIT_CODELIST" Type="Boolean" />
+    <Property Name="EDIT_PICKLISTVATTU" Type="Boolean" />
+  </EntityType>
+  <EntityType Name="MailVerify">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="UserName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Email" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="CodeVerify" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Status" Type="Boolean" />
+  </EntityType>
+  <EntityType Name="CodeList">
+    <Key>
+      <PropertyRef Name="No_" />
+    </Key>
+    <Property Name="No_" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Injection_Code" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Machine_No_" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Machine" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Cycle_Time" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Cavity" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Manpower" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Resin" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Resin_Code" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Weight" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Another_Code" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="ItemName" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="DA_Injection">
+    <Key>
+      <PropertyRef Name="No_" />
+    </Key>
+    <Property Name="No_" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Code" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="So_May" Type="Int32" />
+    <Property Name="Trong_Luong_May" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="C_Good" Type="Double" />
+    <Property Name="Ke_Hoach" Type="Int32" />
+    <Property Name="Ke_Hoach_Bo_Sung" Type="Int32" />
+    <Property Name="Manpower" Type="Double" />
+    <Property Name="Stock" Type="Int32" />
+    <Property Name="Cycle_time" Type="Double" />
+    <Property Name="Cavity" Type="Int32" />
+    <Property Name="Capa" Type="Double" />
+    <Property Name="Balance_Plan" Type="Int32" />
+    <Property Name="Date" Type="DateTime" Precision="0" />
+    <Property Name="Requirements" Type="Int32" />
+    <Property Name="Plan_Time_D_" Type="Double" />
+    <Property Name="Plan_D_" Type="Int32" />
+    <Property Name="Good_D_" Type="Int32" />
+    <Property Name="NG_D_" Type="Int32" />
+    <Property Name="C_NG" Type="Double" />
+    <Property Name="C_Plan_Time_N_" Type="Double" />
+    <Property Name="Plan_N_" Type="Int32" />
+    <Property Name="Good_N_" Type="Int32" />
+    <Property Name="NG_N_" Type="Int32" />
+    <Property Name="Date_End" Type="DateTime" Precision="0" />
+    <Property Name="Week" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="ID_PlanTimeDem" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="ID_PlanTimeNgay" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="PSI" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Statuss" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="plandemtemp" Type="Int32" />
+    <Property Name="plantimedemtemp" Type="Double" />
+    <Property Name="planngaytemp" Type="Int32" />
+    <Property Name="plantimengaytemp" Type="Double" />
+    <Property Name="ID_PlanDem" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="ID_PlanNgay" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Html_PlanTimeDem" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Html_PlanTimeNgay" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="FlagDem" Type="Boolean" />
+    <Property Name="FlagNgay" Type="Boolean" />
+    <Property Name="ID_ValidateDem" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="ID_ValidateNgay" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="ID_Balance" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="ID_KHBS" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Html_SoMay" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="STT" Type="Int32" />
+    <Property Name="ItemName" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="PSI_V_C">
+    <Key>
+      <PropertyRef Name="STT" />
+    </Key>
+    <Property Name="STT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Code" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Description" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Date" Type="DateTime" Precision="0" />
+    <Property Name="Requirement" Type="Int32" />
+  </EntityType>
+</Schema>

@@ -1,0 +1,103 @@
+﻿
+@{
+    ViewBag.Title = "View_VatTu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+        background-color: antiquewhite;
+    }
+    .table tr {
+        text-align: center
+    }
+</style>
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/Home/Add_VatTu" class="btn btn-success"><i class="fa fa-plus-circle"></i> Thêm code mới</a>
+        </li>
+    </ol>
+    <!-- DataTables Example -->
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-table"></i>
+            Data Vật Tư
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Machine No.</th>
+                            <th>Machine</th>
+                            <th>Cycle Time</th>
+                            <th>Cavity</th>
+                            <th>Manpower</th>
+                            <th>Resin</th>
+                            <th>Resin Code</th>
+                            <th>Weight</th>
+                            <th>Vật tư code </th>
+                            <th>Tên vật tư</th>
+                            <th>Tỷ lệ</th>
+                            <th>Another Code</th>
+                            <th>Chỉnh sửa</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Code</th>
+                            <th>Machine No.</th>
+                            <th>Machine</th>
+                            <th>Cycle Time</th>
+                            <th>Cavity</th>
+                            <th>Manpower</th>
+                            <th>Resin</th>
+                            <th>Resin Code</th>
+                            <th>Weight</th>
+                            <th>Vật tư code </th>
+                            <th>Tên vật tư</th>
+                            <th>Tỷ lệ</th>
+                            <th>Another Code</th>
+                            <th>Chỉnh sửa</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @foreach (var x in ViewBag.VatTu)
+                        {
+                        <tr>
+                            <td>@x.Injection_Code</td>
+                            <td>@x.Machine_No_</td>
+                            <td>@x.Machine</td>
+                            <td>@x.Cycle_Time</td>
+                            <td>@x.Cavity</td>
+                            <td>@x.Manpower</td>
+                            <td>@x.Resin</td>
+                            <td>@x.Resin_Code</td>
+                            <td>@x.Weight</td>
+                            <td>@x.Vat_Tu_Code</td>
+                            <td>@x.Ten_Vat_Tu</td>
+                            <td>@x.Ty_Le</td>
+                            <td>@x.Another_Code</td>
+                            <td>
+                                <a href="@Url.Action("Edit_VatTu", "Home", new { Code = x.Injection_Code })" class="btn btn-danger">
+                                    <i class="fas fa-fw fa-edit"></i> &nbsp;Sửa
+                                </a>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer small text-muted"></div>
+    </div>
+    <p class="small text-center text-muted my-5">
+
+    </p>
+</div>
+
+

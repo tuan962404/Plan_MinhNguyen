@@ -1,0 +1,131 @@
+﻿@model PSI_WM_REF
+@{
+    ViewBag.Title = "View_Requirement";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <form action="/Home/View_Requirement" method="post">
+                <h3 style="color:red">Chọn Ngày Xem</h3>
+                <h5>Ngày:</h5> <input type="date" ng-model="Date" name="date" required class="form-control" />
+                <br />
+                <input type="submit" class="btn btn-danger" value="OK" />
+            </form>
+        </li>
+    </ol>
+    <!-- DataTables Example -->
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-table"></i>
+            Yêu cầu sản xuất
+            &nbsp;
+            <a href="/Home/View_Requirement" class="btn btn-success"><i class="fa fa-filter"></i> Xem Tất Cả</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Code</th>
+                            <th>Description</th>
+                            <th>Requirement</th>
+                            <th>Balance Stock</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Date</th>
+                            <th>Code</th>
+                            <th>Description</th>
+                            <th>Requirement</th>
+                            <th>Balance Stock</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @if (ViewBag.AssyOfDate != null)
+                        {
+                            foreach (var c in ViewBag.AssyOfDate)
+                            {
+                                <tr>
+                                    <td>@c.Date</td>
+                                    <td>@c.Code</td>
+                                    <td></td>
+                                    <td>@c.Requirement</td>
+                                    <td></td>
+                                </tr>
+                            }
+
+                            foreach (var u in ViewBag.VC_OfDate)
+                            {
+                                <tr>
+                                    <td>@u.Date</td>
+                                    <td>@u.Code</td>
+                                    <td>@u.Description</td>
+                                    <td>@u.Requirement</td>
+                                    <td></td>
+                                </tr>
+                            }
+
+                            foreach (var i in ViewBag.RefOfDate)
+                            {
+                                <tr>
+                                    <td>@i.Date</td>
+                                    <td>@i.Code</td>
+                                    <td>@i.Description</td>
+                                    <td>@i.Requirements</td>
+                                    <td>@i.Balace_Stock_</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            foreach (var c in ViewBag.Assy)
+                            {
+                                <tr>
+                                    <td>@c.Date</td>
+                                    <td>@c.Code</td>
+                                    <td></td>
+                                    <td>@c.Requirement</td>
+                                    <td></td>
+                                </tr>
+                            }
+
+                            foreach (var u in ViewBag.VC)
+                            {
+                                <tr>
+                                    <td>@u.Date</td>
+                                    <td>@u.Code</td>
+                                    <td>@u.Description</td>
+                                    <td>@u.Requirement</td>
+                                    <td></td>
+                                </tr>
+                            }
+
+                            foreach (var i in ViewBag.Ref)
+                            {
+                                <tr>
+                                    <td>@i.Date</td>
+                                    <td>@i.Code</td>
+                                    <td>@i.Description</td>
+                                    <td>@i.Requirements</td>
+                                    <td>@i.Balace_Stock_</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer small text-muted"></div>
+    </div>
+    <p class="small text-center text-muted my-5">
+
+    </p>
+</div>
+

@@ -1,0 +1,180 @@
+﻿@model DA_Injection
+@{
+    ViewBag.Title = "View_CreateDatePlan";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+        background-color: antiquewhite;
+        z-index:1;
+    }
+</style>
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <form action="/Home/View_CreateDatePlan" method="post">
+            <h3 style="color:red">Chọn Ngày Lập</h3>
+            <h5>Từ Ngày:</h5> <input type="date" ng-model="Date" name="date" required class="form-control" value="@ViewBag.DateStart"/>
+            <h5>Đến Ngày:</h5> <input type="date" ng-model="Date_End" name="date_end" required class="form-control" value="@ViewBag.DateEnd"/>
+            <br />
+            <input type="submit" class="btn btn-danger" value="OK" />
+        </form>
+    </ol>
+    <!-- DataTables Example -->
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-table"></i>
+            Plan
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <td>Ngày</td>
+                            <th>Good/Plan(%)</th>
+                            <th>Mã Hàng/Code</th>
+                            <th>Số Máy</th>
+                            <th>MÁY</th>
+                            <th>Kế Hoạch/Plan</th>
+                            <th>KẾ HOẠCH/BỔ SUNG</th>
+                            <th>Manpower</th>
+                            <th>Stock </th>
+                            <th>Cycle time</th>
+                            <th>Cavity</th>
+                            <th>Capa/Sheep(11)</th>
+                            <th>Ngày</th>
+                            <th>Requirements</th>
+                            <th>Plan Time(D)</th>
+                            <th>Plan(D)</th>
+                            <th>Plan Time(N)</th>
+                            <th>Plan(N)</th>
+                            <th>Ca Đêm(Good)</th>
+                            <th>Ca Ngày(Good)</th>
+                            <th>Ca Đêm(NG)</th>
+                            <th>Ca Ngày(NG)</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr style="background-color:lightblue">
+                            <th colspan="13"></th>
+                            <th style="text-align:center">Total Plan</th>
+                            <th colspan="4"></th>
+                            <th colspan="2" style="text-align:center">Total Good</th>
+                            <th colspan="2" style="text-align:center">Total Not Good</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @if (ViewBag.Assy != null)
+                        {
+                            PlanEntities db = new PlanEntities();
+                            int kehoach = 0;
+
+                            foreach (var u in ViewBag.Assy)
+                            {
+                                string code_assy = u.Code;
+                                DateTime date_assy = u.Date;
+                                var kq = db.CodeLists.Where(x => x.Injection_Code == code_assy || x.Another_Code == code_assy).FirstOrDefault();
+                                var stock = db.Stocks.Where(i => i.Code == code_assy).FirstOrDefault();
+                                var product = db.Production_Result.Where(m => m.Date == date_assy && m.Code == code_assy).FirstOrDefault();
+
+                                int sumassy = Convert.ToInt32(db.SumAssy(code_assy).FirstOrDefault());
+                                int stock_int = Convert.ToInt32(stock.Stock1);
+                                kehoach = sumassy - stock_int;
+
+                                double cycle = Convert.ToDouble(kq.Cycle_Time);
+                                int cavity = Convert.ToInt32(kq.Cavity);
+                                double capa = 3600 / cycle * cavity;
+                                capa = Math.Round(capa - (double)0.005, 1);
+                                <tr>
+                                    <td>@u.Date</td>
+                                    <td>Good/Plan(%)</td>
+                                    <td>@u.Code</td>
+                                    @if (kq != null)
+                                    {
+                                        <td>@kq.Machine_No_</td>
+                                        <td>@kq.Machine</td>
+                                    }
+                                    else
+                                    {
+                                        <td></td>
+                                        <td></td>
+                                    }
+                                    <td>@kehoach</td>
+                                    <td>KẾ HOẠCH/BỔ SUNG</td>
+                                    @if (kq != null)
+                                    {
+                                        <td>@kq.Manpower</td>
+                                    }
+                                    else
+                                    {
+                                        <td></td>
+                                    }
+
+                                    @if (stock != null)
+                                    {
+                                        <td>@stock.Stock1</td>
+                                    }
+                                    else
+                                    {
+                                        <td></td>
+                                    }
+
+                                    @if (kq != null)
+                                    {
+                                        <td>@kq.Cycle_Time</td>
+                                        <td>@kq.Cavity</td>
+                                    }
+                                    else
+                                    {
+                                        <td></td>
+                                        <td></td>
+                                    }
+
+                                    <td>@capa</td>
+                                    <td>@u.Date</td>
+
+                                    <td style="background-color:cadetblue; font-weight:bold;text-align:center">@u.Requirement</td>
+                                    <td style="background-color:darkorange; font-weight:bold;text-align:center"><input id="PLD" type="text" onchange="TextChange(this.value,@capa)" />Plan Time(D)</td>
+                                    <td style="background-color:darkorange; font-weight:bold;text-align:center">@*<input id="PD" type="text"/>*@<div id="PD"></div>Plan(D)</td>
+                                    <td style="background-color:darkorange; font-weight:bold;text-align:center"><input id="PLN" type="text"/>Plan Time(N)</td>
+                                    <td style="background-color:darkorange; font-weight:bold;text-align:center"><input id="PN" type="text"/>Plan(N)</td>
+
+                                    @if (product != null)
+                                    {
+                                        <td>
+                                            @product.Shift1_G_
+                                        </td>
+                                        <td>@product.Shift2_G_</td>
+                                        <td>@product.Shift1_NG_</td>
+                                        <td>@product.Shift2_NG_</td>
+                                    }
+                                    else
+                                    {
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    }
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer small text-muted"></div>
+    </div>
+    <p class="small text-center text-muted my-5">
+    </p>
+</div>
+
+<script>
+    function TextChange(val1,val2) {
+        var kq = val1 * val2;
+        var html = '<input id="PD" type="text"  value="' + kq + '"/>'
+        $("#PD").html(html)
+    }
+</script>

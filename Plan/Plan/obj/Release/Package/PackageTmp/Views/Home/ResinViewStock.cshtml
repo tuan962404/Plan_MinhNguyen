@@ -1,0 +1,69 @@
+﻿
+@{
+    ViewBag.Title = "ResinViewStock";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/Home/AddResinStock" class="btn btn-success"><i class="fa fa-plus-circle"></i> Thêm code mới</a>
+        </li>
+
+        <li class="breadcrumb-item">
+            <a href="/Home/Delete_ResinStock" class="btn btn-danger"><i class="fa fa-minus-circle"></i> Xóa tất cả</a>
+        </li>
+    </ol>
+    <!-- DataTables Example -->
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-table"></i>
+            Resin Stock
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Số lượng</th>
+                            <th>Chỉnh sữa</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Code</th>
+                            <th>Số lượng</th>
+                            <th>Chỉnh sửa</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @if (ViewBag.ListStock != null)
+                        {
+                            foreach (ResinStock x in ViewBag.ListStock)
+                            {
+                                <tr>
+                                    <td>@x.Code</td>
+                                    <td>@x.ResinStock1</td>
+                                    <td>
+                                        <a href="@Url.Action("Edit_ResinStock", "Home", new { Code = x.Code })" class="btn btn-danger">
+                                            <i class="fas fa-fw fa-edit"></i> &nbsp;Chỉnh Sửa
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer small text-muted"></div>
+    </div>
+    <p class="small text-center text-muted my-5">
+
+    </p>
+</div>
+

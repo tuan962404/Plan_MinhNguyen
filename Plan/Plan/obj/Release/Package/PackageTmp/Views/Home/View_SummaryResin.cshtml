@@ -1,0 +1,339 @@
+﻿
+@{
+    ViewBag.Title = "View_SummaryResin";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    #Table {
+        overflow-y: auto;
+        height: 650px;
+    }
+
+        #Table th {
+            position: sticky;
+            top: 0;
+        }
+
+    /* Just common table stuff. Really. */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        padding: 8px 16px;
+    }
+
+    th {
+        background-color: lightsalmon;
+    }
+
+
+    .edit {
+        border-radius: 5px;
+        height: 40px;
+        border: 1px solid #ced4da;
+        width: 100px;
+        text-align: center;
+        outline: none
+    }
+</style>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <a href="/Home/ExportSummary?week=@ViewBag.Week&strdateStart=@ViewBag.dateStart&strdateEnd=@ViewBag.dateEnd" class="btn btn-success">
+            Xuất Excel
+        </a>
+    </div>
+
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Plan Resin Summary -- @ViewBag.Week (By Resin Code)
+        <div style="float:right"><input id="myInput" type="text" placeholder="  Search.." onkeyup="Tim()" style="border-radius:5px;height:35px;border-color:darkgrey;box-shadow: 0 0 0 1pt lightblue;outline:none"></div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive" id="Table">
+
+            <table class="table table-bordered table-hover" id="" width="100%" cellspacing="0">
+                <thead>
+                    <tr style="text-align:center">
+                        <th rowspan="2">Resin Code</th>
+                        <th rowspan="2">Resin</th>
+                        <th rowspan="2">Resin Stock<br />(g)</th>
+                        <th rowspan="2">Total Plan Resin<br />(g)</th>
+                        @{
+                            if (ViewBag.dateStart != null && ViewBag.dateEnd != null)
+                            {
+                                int colum = 0;
+                                DateTime n = ViewBag.dateEnd;
+                                for (DateTime i = ViewBag.dateStart; i <= n; i = i.AddDays(1))
+                                {
+                                    colum++;
+                                }
+                                <th style="background-color:lightskyblue" colspan="@colum">Plan</th>
+                                <th style="background-color:mediumseagreen" colspan="@colum">Balance</th>
+                            }
+                        }
+                    </tr>
+                    <tr style="text-align:center">
+                        @{
+                            if (ViewBag.dateStart != null && ViewBag.dateEnd != null)
+                            {
+                                DateTime n = ViewBag.dateEnd;
+                                for (DateTime i = ViewBag.dateStart; i <= n; i = i.AddDays(1))
+                                {
+                                    string strdate = String.Format("{0:dd-MMMM}", i);
+                                    <th style="background-color:lightskyblue">@strdate</th>
+                                }
+
+                                for (DateTime i = ViewBag.dateStart; i <= n; i = i.AddDays(1))
+                                {
+                                    string strdate = String.Format("{0:dd-MMMM}", i);
+                                    <th style="background-color:mediumseagreen">@strdate</th>
+                                }
+                            }
+                        }
+                    </tr>
+                </thead>
+                <tfoot>
+                </tfoot>
+                <tbody id="myTable">
+                    @if (ViewBag.CodeList != null)
+                    {
+                        PlanEntities db = new PlanEntities();
+
+                        string week = ViewBag.Week;
+                        string codetemp = "";
+                        int istock = 0;
+
+                        foreach (SummaryByProduct i in ViewBag.CodeList)
+                        {
+                            if (i.ResinCode != codetemp)
+                            {
+                                codetemp = i.ResinCode;
+                                string resincode = i.ResinCode;
+                                var resin_stock = db.ResinStocks.FirstOrDefault(x => x.Code == resincode);
+                                if (resin_stock != null)
+                                {
+                                    resin_stock.ResinStock1 = resin_stock.ResinStock1 * 1000;
+                                    istock = (int)resin_stock.ResinStock1;
+                                }
+                                else
+                                {
+                                    istock = 0;
+                                }
+
+                                <tr style="text-align:center">
+                                    <td style="background-color:lightsalmon">
+                                        @i.ResinCode
+                                    </td>
+
+                                    <td>
+                                        @i.Resin
+                                    </td>
+
+                                    <td>
+                                        @if (resin_stock != null)
+                                        {
+                                            string stock = String.Format("{0:n0}",istock);
+                                            @stock
+                                        }
+                                    </td>
+
+                                    <td style="background-color:dodgerblue">
+                                        @{
+                                            if (ViewBag.dateStart != null && ViewBag.dateEnd != null)
+                                            {
+                                                DateTime n = ViewBag.dateEnd;
+                                                string strtong = "";
+                                                int tong = 0;
+                                                for (DateTime j = ViewBag.dateStart; j <= n; j = j.AddDays(1))
+                                                {
+                                                    int sum = 0;
+                                                    sum = db.SummaryByProducts.Where(x => x.ResinCode == resincode && x.Week == week && x.Date == j).Sum(x => x.SoLuong).Value;
+                                                    tong += sum;
+                                                }
+                                                strtong = String.Format("{0:n0}", tong);
+                                                if (resin_stock != null)
+                                                {
+                                                    if (tong > resin_stock.ResinStock1)
+                                                    {
+                                                        <span style="color:red;font-weight:bold">@strtong</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        @strtong
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    @strtong
+                                                }
+                                            }
+                                        }
+                                    </td>
+
+                                    @{
+                                        if (ViewBag.dateStart != null && ViewBag.dateEnd != null)
+                                        {
+                                            DateTime n = ViewBag.dateEnd;
+                                            string strtong = "";
+                                            int sum = 0;
+                                            for (DateTime j = ViewBag.dateStart; j <= n; j = j.AddDays(1))
+                                            {
+                                                sum = db.SummaryByProducts.Where(x => x.ResinCode == resincode && x.Week == week && x.Date == j).Sum(x => x.SoLuong).Value;
+                                                strtong = String.Format("{0:n0}", sum);
+                                                <td style="background-color:lightsteelblue">@strtong</td>
+                                            }
+
+                                            sum = 0;
+                                            for (DateTime j = ViewBag.dateStart; j <= n; j = j.AddDays(1))
+                                            {
+
+                                                if(j == ViewBag.dateStart)
+                                                {
+                                                    sum = db.SummaryByProducts.Where(x => x.ResinCode == resincode && x.Week == week && x.Date == j).Sum(x => x.SoLuong).Value;
+                                                    sum = istock - sum;
+                                                    strtong = String.Format("{0:n0}", sum);
+                                                    if(sum < 0)
+                                                    {
+                                                        <td style="color:red;background-color:darkseagreen">@strtong</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td style="background-color:darkseagreen">@strtong</td>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    int temp = db.SummaryByProducts.Where(x => x.ResinCode == resincode && x.Week == week && x.Date == j).Sum(x => x.SoLuong).Value;
+                                                    sum = sum - temp;
+                                                    strtong = String.Format("{0:n0}", sum);
+                                                    if(sum < 0)
+                                                    {
+                                                        <td style="color:red;background-color:darkseagreen">@strtong</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td style="background-color:darkseagreen">@strtong</td>
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        if(resin_stock != null)
+                                        {
+                                            resin_stock.ResinStock1 = 0;
+                                        }
+                                    }
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+@{ 
+    if(ViewBag.CodeNull != null && ViewBag.CodeNull.Count > 0)
+    {
+        <body onload="showdlog()"></body>
+    }
+}
+
+       @*Dialog*@
+<dialog id="dlog" style="border:none;border-radius:10px">
+    <div class="card mb-3">
+        <div class="card-header">
+            <a href="/Home/ExportResinCodeNull?week=@ViewBag.Week" class="btn btn-success">
+                Xuất Excel
+            </a>
+        </div>
+
+        <div class="card-header">
+            <i class="fas fa-table"></i>
+            Danh Sách Resin Code Không Có Trong Resin Stock!
+        </div>
+        <div class="card-body">
+            <div class="table-responsive" id="Table" style="height:400px">
+                <table class="table table-bordered table-hover" id="" width="100%" cellspacing="0">
+                    <thead>
+                        <tr style="text-align:center">
+                            <th>
+                                Code
+                            </th>
+                            <th>
+                                Resin Code
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        
+                    </tfoot>
+                    <tbody id="myTable">
+                        @if (ViewBag.CodeNull != null)
+                        {
+                            PlanEntities db = new PlanEntities();
+
+                            foreach (var k in ViewBag.CodeNull)
+                            {
+                                string resincode = k;
+                                var p = db.CodeLists.Where(x => x.Resin_Code == resincode).ToList();
+                                if (p.Count > 0)
+                                {
+                                    foreach (var i in p)
+                                    {
+                                        <tr style="text-align:center">
+                                            <td>
+                                                @i.Injection_Code
+                                            </td>
+                                            <td>
+                                                @i.Resin_Code
+                                            </td>
+                                            <td>
+                                                <a href="/Home/Edit_Codelist?Code=@i.Injection_Code" class="btn btn-danger">
+                                                    Chỉnh Sửa
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer small text-muted" style="text-align:center">
+            <input type="button" class="btn btn-success" value="Close" onclick="closedlog()"/>
+        </div>
+    </div>
+</dialog>
+<script>
+    function showdlog() {
+        var getIdDialog = document.getElementById('dlog');
+        getIdDialog.showModal();
+    }
+
+    function closedlog() {
+        var getIdDialog = document.getElementById('dlog');
+        getIdDialog.close();
+    }
+
+    function Tim() {
+        var input = document.getElementById('myInput')
+        var mytable = document.getElementById('myTable')
+        var tag = mytable.getElementsByTagName('tr')
+        var value = $(input).val().toLowerCase();
+
+        $("#myTable tr").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    }
+</script>
+

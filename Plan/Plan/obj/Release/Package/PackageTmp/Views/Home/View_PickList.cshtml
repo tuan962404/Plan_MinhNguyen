@@ -1,0 +1,437 @@
+﻿@model DA_Injection
+@{
+    ViewBag.Title = "View_PickList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+        background-color: lavender;
+    }
+
+    #Table {
+        overflow-y: auto;
+        height: 550px;
+    }
+
+        #Table th {
+            position: sticky;
+            top: 0;
+        }
+
+    /* Just common table stuff. Really. */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        padding: 8px 16px;
+    }
+
+    th {
+        background: lightblue;
+    }
+</style>
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <form action="/Home/View_PickList" method="post">
+            @Html.AntiForgeryToken()
+            <h3 style="color:red">Chọn Ngày Pick</h3>
+
+            <h5>Ngày:</h5> <input type="date" ng-model="Date" name="date" required class="form-control" value="@ViewBag.Date" />
+            <br />
+            <input type="hidden" ng-model="Week" name="week" value="@ViewBag.Week" />
+            <input type="submit" class="btn btn-danger" value="OK" />
+        </form>
+    </ol>
+    <!-- DataTables Example -->
+
+    <div class="card mb-3">
+        <div class="card-header">
+            @{
+                if (ViewBag.Date != null)
+                {
+                    <form action="/Home/ExportExcel" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" ng-model="Week" name="week" value="@ViewBag.Week" />
+                        <input type="hidden" ng-model="Date" name="date" required class="form-control" value="@ViewBag.Date" />
+                        <input type="submit" value="Xuất Excel" class="btn btn-success"/>
+                    </form>
+                    @*DateTime ngay = Convert.ToDateTime(ViewBag.Date);
+                    string strdate = ngay.ToShortDateString();
+                    <input type="button" value="Xuất Excel" class="btn btn-success" onclick="ExportExcel('@strdate','@ViewBag.Week')" />*@
+                }
+            }
+        </div>
+        
+        <div class="card-header">
+            <i class="fas fa-table"></i>
+            @{
+                if (ViewBag.DateStart != null && ViewBag.DateEnd != null)
+                {
+                    DateTime datetemp = ViewBag.DateStart;
+                    int day = datetemp.Day;
+                    string strdate = Convert.ToDateTime(ViewBag.DateEnd).ToShortDateString();
+                    <span>Plan Daily PickList-- <span style="color:red"> (@day - @strdate) </span></span>
+                }
+                else
+                {
+                    string date_format = Convert.ToDateTime(ViewBag.Date).ToShortDateString();
+                    <span>Plan Daily PickList-- <span style="color:red"> (@date_format)</span></span>
+                }
+            }
+
+            <div style="float:right"><input id="myInput" type="text" placeholder="  Search.." onkeyup="Tim()" style="border-radius:5px;height:35px;border-color:darkgrey;box-shadow: 0 0 0 1pt lightblue;outline:none"></div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive" id="Table">
+
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr style="text-align:center;background-color:navajowhite">
+                            <th>Date</th>
+                            <th>Code</th>
+                            <th>Machine</th>
+                            <th>Material Code</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Rate</th>
+                            <th>
+                                Net Weight<br />
+                                (g)
+                            </th>
+                            <th>
+                                Plan Quantity<br />
+                                (pcs)
+                            </th>
+                            <th>
+                                Plan Resin<br />
+                                (g)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        @*<tr style="text-align:center;background-color:navajowhite">
+                            <th>Date</th>
+                            <th>Code</th>
+                            <th>Machine</th>
+                            <th>Material Code</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Rate</th>
+                            <th>
+                                Net Weight<br />
+                                (g)
+                            </th>
+                            <th>
+                                Plan Quantity<br />
+                                (pcs)
+                            </th>
+                            <th>
+                                Plan Resin<br />
+                                (g)
+                            </th>
+                        </tr>*@
+                    </tfoot>
+                    <tbody id="myTable">
+                        @if (ViewBag.DA != null)
+                        {
+                            PlanEntities db = new PlanEntities();
+
+                            foreach (var i in ViewBag.DA)
+                            {
+                                string code = i.Code;
+                                var kq = db.CodeLists.Where(x => x.Injection_Code == code || x.Another_Code == code).FirstOrDefault();
+                                if (kq != null)
+                                {
+                                    kq.Weight = kq.Weight.Replace(".", ",");
+                                }
+                                <tr style="text-align:center;background-color:lightsalmon">
+                                    <td>
+                                        @{
+                                            DateTime date = i.Date;
+                                            string shortDate = date.ToShortDateString();
+                                        }
+                                        @shortDate
+                                    </td>
+                                    <td>@i.Code</td>
+                                    <td>
+                                        @{
+                                            if (kq != null)
+                                            {
+                                                @kq.Machine_No_;
+                                            }
+                                        }
+                                    </td>
+                                    <td>
+                                        @{
+                                            if (kq != null)
+                                            {
+                                                @kq.Resin_Code;
+                                            }
+                                        }
+                                    </td>
+                                    <td>Resin</td>
+                                    <td>
+                                        @{
+                                            if (kq != null)
+                                            {
+                                                @kq.Resin;
+                                            }
+                                        }
+                                    </td>
+                                    <td>
+                                        @{
+                                            int index = 0;
+                                            if (kq != null)
+                                            {
+                                                index = kq.Resin_Code.IndexOf("\n");
+                                                string strtemp = "";
+                                                if (index != -1)
+                                                {
+                                                    strtemp = "0,96";
+                                                    @strtemp
+                                                }
+                                                else
+                                                {
+                                                    strtemp = "1";
+                                                    @strtemp
+                                                }
+                                            }
+                                        }
+                                    </td>
+                                    <td>
+                                        @{
+                                            if (kq != null)
+                                            {
+                                                @kq.Weight;
+                                            }
+                                        }
+                                    </td>
+                                    <td>
+                                        @{
+                                            int sum = 0;
+                                            if (i.Plan_D_ != null)
+                                            {
+                                                sum += i.Plan_D_;
+                                            }
+
+                                            if (i.Plan_N_ != null)
+                                            {
+                                                sum += i.Plan_N_;
+                                            }
+
+                                            string strsum = String.Format("{0:n0}", sum);
+                                            @strsum
+                                        }
+                                    </td>
+                                    <td>
+                                        @{
+                                            index = kq.Resin_Code.IndexOf("\n");
+                                            double planresin = 0;
+                                            if (index != -1)
+                                            {
+                                                planresin = sum * Convert.ToDouble(kq.Weight) * 0.96;
+                                            }
+                                            else
+                                            {
+                                                planresin = sum * Convert.ToDouble(kq.Weight) * 1;
+                                            }
+                                            planresin = Math.Ceiling(planresin);
+                                            strsum = String.Format("{0:n0}", planresin);
+                                            @strsum
+                                        }
+                                    </td>
+                                </tr>
+
+                                //Tách code trộn
+                                if (kq != null)
+                                {
+                                    index = kq.Resin_Code.IndexOf("\n");
+                                    if (index != -1)
+                                    {
+                                        string[] arrListStr = kq.Resin_Code.Split('\n');
+
+                                        <tr style="text-align:center;background-color:lightgoldenrodyellow">
+                                            <td>
+                                                @shortDate
+                                            </td>
+                                            <td>@i.Code</td>
+                                            <td>
+                                                @{
+                                                    if (kq != null)
+                                                    {
+                                                        @kq.Machine_No_;
+                                                    }
+                                                }
+                                            </td>
+                                            <td>
+                                                @arrListStr[1]
+                                            </td>
+
+                                            <td>
+                                                Mix Resin
+                                            </td>
+
+                                            <td></td>
+                                            <td>0,04</td>
+                                            <td>
+                                                @{
+                                                    if (kq != null)
+                                                    {
+                                                        @kq.Weight;
+                                                    }
+                                                }
+                                            </td>
+                                            <td>
+                                                @{
+                                                    sum = 0;
+                                                    if (i.Plan_D_ != null)
+                                                    {
+                                                        sum += i.Plan_D_;
+                                                    }
+
+                                                    if (i.Plan_N_ != null)
+                                                    {
+                                                        sum += i.Plan_N_;
+                                                    }
+                                                    strsum = String.Format("{0:n0}", sum);
+
+                                                    @strsum
+                                                }
+                                            </td>
+                                            <td>
+                                                @{
+                                                    double temp = 0.04;
+                                                    planresin = sum * Convert.ToDouble(kq.Weight) * temp;
+                                                    planresin = Math.Ceiling(planresin);
+                                                    strsum = String.Format("{0:n0}", planresin);
+
+                                                    @strsum
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+
+
+                                //lay ben picklist
+                                var rel = db.PicklistVatTus.Where(x => x.Injection_Code == code || x.Another_Code == code).ToList();
+                                if (rel != null)
+                                {
+                                    foreach (var k in rel)
+                                    {
+                                        k.Ty_Le = k.Ty_Le.Replace(".", ",");
+                                        <tr style="text-align:center;background-color:lightgoldenrodyellow">
+                                            <td>
+                                                @shortDate
+                                            </td>
+                                            <td>@i.Code</td>
+                                            <td>
+                                                @{
+                                                    if (kq != null)
+                                                    {
+                                                        @kq.Machine_No_;
+                                                    }
+                                                }
+                                            </td>
+                                            
+                                            <td>
+                                                @k.Vat_Tu_Code
+                                            </td>
+
+                                            <td>
+                                                Material
+                                            </td>
+
+                                            <td>
+                                                @k.Ten_Vat_Tu
+                                            </td>
+                                            <td>
+                                                @k.Ty_Le
+                                            </td>
+
+                                            <td></td>
+
+                                            <td>
+                                                @{
+                                                    strsum = String.Format("{0:n0}", sum);
+                                                }
+                                                @strsum
+                                            </td>
+                                            <td>
+                                                @{
+                                                    if (k.Ty_Le != "")
+                                                    {
+                                                        index = k.Ty_Le.IndexOf("cm");
+                                                        if (index != -1)
+                                                        {
+                                                            string[] arrListStr = k.Ty_Le.Split('c');
+                                                            double tyle = Convert.ToDouble(arrListStr[0]);
+                                                            planresin = sum * tyle;
+                                                            planresin = Math.Ceiling(planresin);
+                                                            strsum = String.Format("{0:n0}", planresin) + " cm";
+                                                            @strsum
+                                                        }
+                                                        else
+                                                        {
+                                                            double tyle = Convert.ToDouble(k.Ty_Le);
+                                                            planresin = sum * tyle;
+                                                            planresin = Math.Ceiling(planresin);
+                                                            strsum = String.Format("{0:n0}", planresin);
+                                                            @strsum
+                                                        }
+
+                                                    }
+                                                }
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td colspan="10"></td>
+                                        </tr>
+                                    }
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer small text-muted"></div>
+    </div>
+    <p class="small text-center text-muted my-5">
+
+    </p>
+</div>
+
+<script>
+    function ExportExcel(strdate, week) {
+        $.ajax({
+            cache: false,
+            url: '/Home/ExportExcel',
+            data: {
+                strdate: strdate,
+                week: week
+            },
+            dataType: "json",
+            type: "GET",
+            success: function (data) {
+                window.location = '/Home/Download?fileGuid=' + data.FileGuid
+                    + '&filename=' + data.FileName;
+            }
+        })
+    }
+
+    function Tim() {
+        var input = document.getElementById('myInput')
+        var mytable = document.getElementById('myTable')
+        var tag = mytable.getElementsByTagName('tr')
+        var value = $(input).val().toLowerCase();
+
+        $("#myTable tr").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    }
+</script>

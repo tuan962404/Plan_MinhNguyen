@@ -1,0 +1,21 @@
+﻿
+@{
+    ViewBag.Title = "Import_CodeList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Import_CodeList</h2>
+@using (Html.BeginForm("Import_CodeList", "Home", FormMethod.Post, new { EncType = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <hr />
+    @Html.ValidationSummary("", new { @class = "text-danger" })
+    <div class="form-group">
+
+        <div class="col-md-10">
+            <input type="file" name="file" />
+            <br /><br />
+            <input type="submit" class="btn btn-danger" value="Import" />
+        </div>
+    </div>
+}

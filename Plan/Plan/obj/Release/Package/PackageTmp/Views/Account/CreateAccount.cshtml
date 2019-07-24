@@ -1,0 +1,124 @@
+﻿@model Plan.Models.MUser
+@{
+    ViewBag.Title = "CreateAccount";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<form action="/Account/CreateAccount" method="post" autocomplete="off">
+    @Html.AntiForgeryToken()
+    <div class="container">
+        <div class="card card-register mx-auto mt-5">
+            <div class="card-header">
+                @{
+                    if (ViewBag.Success == null)
+                    {
+                        @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                    }
+                    else
+                    {
+                        @Html.ValidationSummary(false, "", new { @class = "text-success" })
+                    }
+                }
+            </div>
+            <div class="card-header">
+                Tạo mới tài khoản
+                <div style="float:right">
+                    <input type="submit" value="Tạo tài khoản" class="btn btn-success" />
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <div class="form-row">
+                        <div class="col-md-3">
+                            <label class="label label-success">Mr/Ms: </label>
+
+                        </div>
+                        <div class="col-md-9">
+                            <input class="form-control" ng-model="Name" name="name" required />
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+
+                    <div class="form-row">
+                        <div class="col-md-3">
+                            <label class="label label-success">Họ và tên: </label>
+                        </div>
+                        <div class="col-md-9">
+                            <input class="form-control" ng-model="FullName" name="FullName" />
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+
+                    <div class="form-row">
+                        <div class="col-md-3">
+                            <label class="label label-success">Bộ phận: </label>
+                        </div>
+                        <div class="col-md-9">
+                            <input class="form-control" ng-model="BoPhan" name="BoPhan" />
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+
+                    <div class="form-row">
+                        <div class="col-md-3">
+                            <label class="label label-success">Số điện thoại: </label>
+                        </div>
+                        <div class="col-md-9">
+                            <input class="form-control" ng-model="NumberPhone" name="NumberPhone" />
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+
+                    <div class="form-row">
+                        <div class="col-md-3">
+                            <label class="label label-success">Email: </label>
+                        </div>
+                        <div class="col-md-9">
+                            <input type="email" class="form-control" ng-model="Email" name="Email" required />
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+
+                    <div class="form-row">
+                        <div class="col-md-3">
+                            <label class="label label-success">User: </label>
+
+                        </div>
+                        <div class="col-md-9">
+                            <input class="form-control" ng-model="User1" name="User1" required />
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+
+                    <div class="form-row">
+                        <div class="col-md-3">
+                            <label class="label label-success">Password: </label>
+                        </div>
+                        <div class="col-md-9">
+                            <input class="form-control" ng-model="Password" name="Password" type="password" required />
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+
+                    <div class="form-row">
+                        <div class="col-md-3">
+                            <label class="label label-success">Xác thực mật khẩu: </label>
+                        </div>
+                        <div class="col-md-9">
+                            <input class="form-control" ng-model="ConfirmPassword" name="ConfirmPassword" type="password" required />
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>
+

@@ -1,0 +1,101 @@
+﻿@model Production_Result
+@{
+    ViewBag.Title = "Edit_Product";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{ 
+    var x = (Production_Result)ViewBag.Product;
+}
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <form action="/Home/View_Product" method="post">
+            @Html.AntiForgeryToken()
+            <h3 style="color:red">Chọn Ngày Xem</h3>
+
+            <h5>Ngày:</h5> <input type="date" ng-model="Date" name="date" required class="form-control" value="@ViewBag.Date" />
+            <br />
+            <input type="submit" class="btn btn-danger" value="OK" />
+        </form>
+    </ol>
+    <!-- DataTables Example -->
+    <div class="alert" style="background-color:darkseagreen;text-align:center">
+        @if (ViewBag.Successed != null)
+        {
+            <h3 style="color:red;font-weight:bold">@ViewBag.Successed</h3>
+        }
+    </div>
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-table"></i>
+            Cập nhật kết quả sản xuất
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                @using (Html.BeginForm("Edit_Product", "Home", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Code</th>
+                                <th>Good (Shift1)</th>
+                                <th>Good (Shift3)</th>
+                                <th>Not Good (Shift1)</th>
+                                <th>Not Good (Shift3)</th>
+                                <th>Edit</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Date</th>
+                                <th>Code</th>
+                                <th>Good (Shift1)</th>
+                                <th>Good (Shift3)</th>
+                                <th>Not Good (Shift1)</th>
+                                <th>Not Good (Shift3)</th>
+                                <th>Edit</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                            <tr>
+                                <th>
+                                    @Html.TextBoxFor(m => m.Date, "", new { @class = "form-control", @Value = ViewBag.Date, @readonly = "true" })
+                                </th>
+                                <th>
+                                    @Html.TextBoxFor(m => m.Code, "", new { @class = "form-control", @Value = ViewBag.Code, @readonly = "true" })
+                                </th>
+                                <th>
+                                    @Html.TextBoxFor(m => m.Shift1_G_, "", new { @class = "form-control", @Value = ViewBag.Good_S1, @required = "true" })
+                                    @Html.ValidationMessageFor(m => m.Shift1_G_, "", new { @class = "text-danger" })
+                                </th>
+                                <th>
+                                    @Html.TextBoxFor(m => m.Shift2_G_, "", new { @class = "form-control", @Value = ViewBag.Good_S3, @required = "true" })
+                                    @Html.ValidationMessageFor(m => m.Shift2_G_, "", new { @class = "text-danger" })
+                                </th>
+                                <th>
+                                    @Html.TextBoxFor(m => m.Shift1_NG_, "", new { @class = "form-control", @Value = ViewBag.NGood_S1, @required = "true" })
+                                    @Html.ValidationMessageFor(m => m.Shift1_NG_, "", new { @class = "text-danger" })
+                                </th>
+                                <th>
+                                    @Html.TextBoxFor(m => m.Shift2_NG_, "", new { @class = "form-control", @Value = ViewBag.NGood_S3, @required = "true" })
+                                    @Html.ValidationMessageFor(m => m.Shift2_NG_, "", new { @class = "text-danger" })
+                                </th>
+                                <th>
+                                    <input type="submit" class="btn btn-danger" value="Nhập" />
+                                </th>
+                            </tr>
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+        <div class="card-footer small text-muted"></div>
+    </div>
+    <p class="small text-center text-muted my-5">
+
+    </p>
+</div>
+
+

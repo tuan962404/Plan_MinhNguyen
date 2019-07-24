@@ -1,0 +1,96 @@
+﻿
+@{
+    ViewBag.Title = "View_PlanWeek_SummaryProduct";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    #Table {
+        overflow-y: auto;
+        height: 550px;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    <!-- DataTables Example -->
+
+    <div class="card mb-3">
+        <div class="card-header" style="font-weight:bold;font-size:21px">
+            <i class="fas fa-table"></i>
+            Plan Resin Summary (By Product)
+            <div style="float:right;font-size:16px"><input id="myInput" type="text" placeholder="  Search.." onkeyup="Tim()" style="border-radius:5px;height:35px;border-color:darkgrey;box-shadow: 0 0 0 1pt lightblue;outline:none"></div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive" id="Table">
+
+                <table class="table table-bordered" id="" width="100%" cellspacing="0">
+                    <thead>
+                        <tr style="text-align:center">
+                            <th>Ngày</th>
+                            <th>Tuần</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr style="text-align:center">
+                            <th>Ngày</th>
+                            <th>Tuần</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                    <tbody id="myTable">
+                        @if (ViewBag.PlanWeek != null)
+                        {
+                            foreach (var x in ViewBag.PlanWeek)
+                            {
+                                <tr>
+                                    <td>
+                                        @{
+                                            DateTime dateStart = x.DateStart;
+                                            int idateStart = dateStart.Day;
+
+                                            DateTime dateEnd = x.DateEnd;
+                                            string strdateEnd = dateEnd.ToShortDateString();
+
+                                        }
+                                        <h5 style="text-align:center">
+                                            BẢNG THEO DÕI SỐ LƯỢNG SẢN XUẤT<br />
+                                            <span style="color:red">(@idateStart-@strdateEnd)</span>
+                                        </h5>
+                                    </td>
+                                    <td>
+                                        <h5 style="text-align:center">@x.Week</h5>
+                                    </td>
+                                    <td style="text-align:center">
+                                        <a href="@Url.Action("View_SummaryProduct", "Home", new {week = x.Week,dateStart=dateStart,dateEnd=dateEnd})" class="btn btn-danger">
+                                            <i class="fas fa-fw fa-database"></i> &nbsp;Chọn
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer small text-muted"></div>
+    </div>
+    <p class="small text-center text-muted my-5">
+
+    </p>
+</div>
+
+<script>
+    function Tim() {
+        var input = document.getElementById('myInput')
+        var mytable = document.getElementById('myTable')
+        var tag = mytable.getElementsByTagName('tr')
+        var value = $(input).val().toLowerCase();
+
+        $("#myTable tr").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    }
+</script>
+

@@ -1,0 +1,62 @@
+﻿@model ResinStock
+@{
+    ViewBag.Title = "AddResinStock";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    @*<ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="#">Dashboard</a>
+            </li>
+            <li class="breadcrumb-item active">Tables</li>
+        </ol>*@
+    <!-- DataTables Example -->
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-table"></i>
+            Thêm code mới
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                @using (Html.BeginForm("AddResinStock", "Home", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <hr />
+
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Số lượng</th>
+                                <th>Thêm</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Code</th>
+                                <th>Số lượng</th>
+                                <th>Thêm</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    @Html.TextBoxFor(m => m.Code, new { @class = "form-control", @required = "true" })
+                                    @Html.ValidationMessageFor(m => m.Code, "", new { @class = "text-danger" })
+                                </td>
+                                <td>
+                                    @Html.TextBoxFor(m => m.ResinStock1, new { @class = "form-control" , @required = "true" })
+                                    @Html.ValidationMessageFor(m => m.ResinStock1, "", new { @class = "text-danger" })
+                                </td>
+                                <td><input type="submit" class="btn btn-outline-danger" value="Thêm" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                }
+            </div>
+            <div class="card-footer small text-muted"></div>
+        </div>
+    </div>
+

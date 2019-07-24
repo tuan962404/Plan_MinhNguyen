@@ -1,0 +1,174 @@
+﻿@{
+    ViewBag.Title = "ViewInfo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model User
+@{
+    User user = ViewBag.Info;
+}
+
+<style>
+    .form-row:hover {
+        background-color: ghostwhite;
+    }
+
+    .edit {
+        border-radius: 5px;
+        height: 40px;
+        border: 1px solid #ced4da;
+        width: 300px;
+        text-align: center;
+        outline: none;
+        float: right;
+        margin-right: 40px
+    }
+</style>
+
+<div class="container">
+    <div class="card card-register mx-auto mt-5">
+        <div class="card-header">
+            @{
+                if (ViewBag.Success == null)
+                {
+                    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                }
+                else
+                {
+                    @Html.ValidationSummary(false, "", new { @class = "text-success" })
+                }
+            }
+        </div>
+        <div class="card-header">
+            Thông tin tài khoản
+            <a href="" data-toggle="modal" data-target="#logoutModal" style="float:right">
+                <i class="fa fa-edit" style="color:mediumturquoise"></i>
+                <label class="chinhsua" for="lastName" style="cursor:pointer;color:mediumturquoise;">Chỉnh sửa</label>
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="col-md-3">
+                        <label class="label label-success">Mr/Ms: </label>
+
+                    </div>
+                    <div class="col-md-9">
+                        <label for="lastName">@user.Name</label>
+                    </div>
+                </div>
+
+                <div class="dropdown-divider"></div>
+
+                <div class="form-row">
+                    <div class="col-md-3">
+                        <label class="label label-success">Họ và tên: </label>
+
+                    </div>
+                    <div class="col-md-9">
+                        <label for="lastName">@user.FullName</label>
+                    </div>
+                </div>
+
+                <div class="dropdown-divider"></div>
+
+                <div class="form-row">
+                    <div class="col-md-3">
+                        <label class="label label-success">Bộ phận: </label>
+
+                    </div>
+                    <div class="col-md-9">
+                        <label for="lastName">@user.BoPhan</label>
+                    </div>
+                </div>
+
+                <div class="dropdown-divider"></div>
+
+                <div class="form-row">
+                    <div class="col-md-3">
+                        <label class="label label-success">User: </label>
+
+                    </div>
+                    <div class="col-md-9">
+                        <label for="lastName">@user.User1</label>
+                    </div>
+                </div>
+
+                <div class="dropdown-divider"></div>
+
+                <div class="form-row">
+                    <div class="col-md-3">
+                        <label class="label label-success">Password: </label>
+
+                    </div>
+                    <div class="col-md-9">
+                        <label for="lastName">******</label>
+                    </div>
+                </div>
+
+                <div class="dropdown-divider"></div>
+
+                <div class="form-row">
+                    <div class="col-md-3">
+                        <label class="label label-success">Email: </label>
+
+                    </div>
+                    <div class="col-md-9">
+                        <label for="lastName">@user.Email</label>
+                    </div>
+                </div>
+
+                <div class="dropdown-divider"></div>
+
+                <div class="form-row">
+                    <div class="col-md-3">
+                        <label class="label label-success">Số điện thoại: </label>
+
+                    </div>
+                    <div class="col-md-9">
+                        @if (user.NumberPhone != null)
+                        {
+                            string number = "0" + user.NumberPhone.ToString();
+                            <label for="lastName">@number</label>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form action="/Account/EditInfo" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    Chỉnh sửa
+                </div>
+                <div class="modal-body" style="font-weight:bold">
+                    Mr/Ms: <input value="@user.Name" maxlength="30" ng-model="Name" name="name" class="form-control" placeholder="Mr/Ms" />
+                    <br />
+                    Họ và tên:
+                    <input value="@user.FullName" maxlength="30" class="form-control" ng-model="FullName" name="fullname" placeholder="Họ và tên" />
+                    <br />
+                    Bộ phận:
+                    <input value="@user.BoPhan" maxlength="30" class="form-control" ng-model="BoPhan" name="bophan" placeholder="Bộ phận" />
+                    <br />
+                    User:
+                    <input value="@user.User1" maxlength="30" class="form-control" ng-model="User1" name="user1" placeholder="User" readonly />
+                    <br />
+                    Email:
+                    <input value="@user.Email" maxlength="30" class="form-control" ng-model="Email" name="Email" placeholder="Email" />
+                    <br />
+                    Số điện thoại:
+                    <input value="@user.NumberPhone" maxlength="30" class="form-control" ng-model="NumberPhone" name="NumberPhone" placeholder="NumberPhone" />
+                </div>
+                <div class="modal-footer" style="text-align:center">
+                    <input type="password" class="form-control" placeholder="Nhập mật khẩu xác thực" ng-model="Password" name="password"/>
+                    <input hidden value="@user.ID" ng-model="ID" name="id" />
+                    <input type="submit" value="Cập nhật" class="btn btn-success" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

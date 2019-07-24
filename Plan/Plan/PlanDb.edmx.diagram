@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="003eb0299ec54e73b3e96c21a76cbd4e" Name="Diagram1" ZoomLevel="74">
+        <EntityTypeShape EntityType="PlanModel.PicklistVatTu" Width="1.5" PointX="3.375" PointY="7.75" />
+        <EntityTypeShape EntityType="PlanModel.Stock" Width="1.5" PointX="5.375" PointY="6.75" />
+        <EntityTypeShape EntityType="PlanModel.Assy_PSI_Shortage" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="PlanModel.PSI_WM_REF" Width="1.5" PointX="0.75" PointY="3.75" />
+        <EntityTypeShape EntityType="PlanModel.Production_Result" Width="1.5" PointX="0.75" PointY="6.75" />
+        <EntityTypeShape EntityType="PlanModel.Plan_Week" Width="1.5" PointX="5.375" PointY="0.75" />
+        <EntityTypeShape EntityType="PlanModel.KetQuaSanXuatThieu" Width="1.5" PointX="9.375" PointY="0.75" />
+        <EntityTypeShape EntityType="PlanModel.ResinStock" Width="1.5" PointX="9.375" PointY="4.75" />
+        <EntityTypeShape EntityType="PlanModel.SummaryByProduct" Width="1.5" PointX="9.375" PointY="7.75" />
+        <EntityTypeShape EntityType="PlanModel.Credential" Width="1.5" PointX="11.375" PointY="0.75" />
+        <EntityTypeShape EntityType="PlanModel.UserGroup" Width="1.5" PointX="5.375" PointY="11.75" />
+        <EntityTypeShape EntityType="PlanModel.Role" Width="1.5" PointX="0.75" PointY="10.75" />
+        <EntityTypeShape EntityType="PlanModel.Domain" Width="1.5" PointX="7.375" PointY="11.75" />
+        <EntityTypeShape EntityType="PlanModel.MailServer" Width="1.5" PointX="13.375" PointY="0.75" />
+        <EntityTypeShape EntityType="PlanModel.User" Width="1.5" PointX="11.375" PointY="3.75" />
+        <EntityTypeShape EntityType="PlanModel.MailVerify" Width="1.5" PointX="9.375" PointY="11.75" />
+        <EntityTypeShape EntityType="PlanModel.CodeList" Width="1.5" PointX="11.75" PointY="11.75" />
+        <EntityTypeShape EntityType="PlanModel.DA_Injection" Width="1.5" PointX="0.75" PointY="13.75" />
+        <EntityTypeShape EntityType="PlanModel.PSI_V_C" Width="1.5" PointX="3.375" PointY="3.75" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

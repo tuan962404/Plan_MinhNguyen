@@ -1,0 +1,63 @@
+﻿@model DA_Injection
+@{
+    ViewBag.Title = "Chose_Date_Product_Result";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <form action="/Home/Add_Production" method="post">
+            @Html.AntiForgeryToken()
+            <h3 style="color:red">Chọn Ngày Nhập</h3>
+            <h5>Ngày:</h5> <input type="date" ng-model="Date" name="date" required class="form-control" />
+            <br />
+            <input type="hidden" ng-model="Week" name="week" value="@ViewBag.Week"/>
+            <input type="submit" class="btn btn-danger" value="OK" />
+        </form>
+    </ol>
+    <!-- DataTables Example -->
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-table"></i>
+             Nhập Kết Quả Sản Xuất
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Code</th>
+                            <th>Good (Shift1)</th>
+                            <th>Good (Shift3)</th>
+                            <th>Not Good (Shift1)</th>
+                            <th>Not Good (Shift3)</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Date</th>
+                            <th>Code</th>
+                            <th>Good (Shift1)</th>
+                            <th>Good (Shift3)</th>
+                            <th>Not Good (Shift1)</th>
+                            <th>Not Good (Shift3)</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                       
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer small text-muted"></div>
+    </div>
+    <p class="small text-center text-muted my-5">
+
+    </p>
+</div>
+
+
