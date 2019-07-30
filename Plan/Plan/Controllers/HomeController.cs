@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -387,10 +387,10 @@ namespace Plan.Controllers
             }
         }
 
-        public bool isNumber(string text="0,123")
+        public bool isNumber(string text)
         {
             bool flag = false;
-            Regex reg = new Regex(@"[a-zA-Z\d+\.?\d|\.\d]");
+            Regex reg = new Regex("^[()]$");
             if (reg.IsMatch(text))
             {
                 flag = true;
@@ -402,259 +402,277 @@ namespace Plan.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Import_PSI_WM_REF(HttpPostedFileBase file)
         {
-            try
+            if (file != null && file.ContentLength > 0)
             {
-                if (file != null && file.ContentLength > 0)
+                if (file.FileName.EndsWith("xls") || file.FileName.EndsWith("xlsx"))
                 {
-                    if (file.FileName.EndsWith("xls") || file.FileName.EndsWith("xlsx"))
+                    string path = Server.MapPath("~/Content/Files/") + Path.GetFileName(file.FileName);
+                    file.SaveAs(path);
+                    Excel.Application app = new Excel.Application();
+                    //app.Visible = true;
+                    Excel.Workbook workbook = app.Workbooks.Open(path);
+                    try
                     {
-                        string path = Server.MapPath("~/Content/Files/") + Path.GetFileName(file.FileName);
-                        file.SaveAs(path);
-                        Excel.Application app = new Excel.Application();
-                        //app.Visible = true;
-                        Excel.Workbook workbook = app.Workbooks.Open(path);
                         Excel.Worksheet worksheet = workbook.Worksheets["PSI WM REF"];
                         worksheet.Columns.AutoFit();
                         //worksheet.Rows.AutoFit();
                         Excel.Range range = worksheet.UsedRange;
-                        int temp = 0;
-                        for (int row = 7; row <= range.Rows.Count; row++)
+                        try
                         {
-                            if (((Excel.Range)range.Cells[row, 3]).Text == "")
+                            int temp = 0;
+                            for (int row = 7; row <= range.Rows.Count; row++)
                             {
-                                continue;
-                            }
-                            PSI_WM_REF psi_wm_ref = new PSI_WM_REF();
-                            int row2 = 5;
-                            for (int col = 23; col <= range.Columns.Count; col++)
-                            {
-                                string replace_balance1;
-                            if (IsDate(((Excel.Range)range.Cells[row2, col]).Text) == false)
-                            {
-                                continue;
-                            }
-                            if (row == 7)
+                                if (((Excel.Range)range.Cells[row, 3]).Text == "")
                                 {
-                                    string code_check = ((Excel.Range)range.Cells[row, 3]).Text;
-                                    string date_str = ((Excel.Range)range.Cells[row2, col]).Text;
-                                    DateTime date_check = Convert.ToDateTime(date_str);
-                                    var kq = db.PSI_WM_REF.Where(x => x.Date == date_check && x.Code == code_check).FirstOrDefault();
-                                    if(kq != null)
-                                    {
-                                        kq.Code = (((Excel.Range)range.Cells[row, 3]).Text);
-                                        kq.Description = (((Excel.Range)range.Cells[row, 4]).Text);
-                                        string date = ((Excel.Range)range.Cells[row2, col]).Text;
-                                        kq.Date = Convert.ToDateTime(date);
-                                        int t1 = row2 + 2;
-                                        string t3 = ((Excel.Range)range.Cells[t1, col]).Text;
-                                        string replace_number_plus = t3.Replace(".", "");
-                                        string replace_number = replace_number_plus.Replace(",", "");
-                                        if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
-                                        {
-                                            psi_wm_ref.Requirements = 0;
-                                        }
-                                        else
-                                        {
-                                            kq.Requirements = Convert.ToInt32(replace_number);
-                                        }
-
-                                        int t4 = row2 + 4;
-                                        char[] charsToTrim = { '(', ')' };
-                                        string balance_str = ((Excel.Range)range.Cells[t4, col]).Text;
-                                        string replace_balance_plus = balance_str.Replace(".", "");
-                                        string replace_balance = replace_balance_plus.Replace(",", "");
-                                        if (isNumber(replace_balance))
-                                        {
-                                            replace_balance1 = replace_balance.Trim(charsToTrim);
-                                            replace_balance1 = "-" + replace_balance1;
-                                        }
-                                        else
-                                        {
-                                            replace_balance1 = replace_balance;
-                                        }
-
-                                        if (replace_balance1 == "#NAME!" || replace_balance1 == "#N/A" || replace_balance1 == "#VALUE!" || replace_balance1 == "#REF!" || replace_balance1 == "#NUM!" || replace_balance1 == "#NULL" || replace_balance1 == "#DIV/0!" || replace_balance1 == "")
-                                        {
-                                            kq.Balace_Stock_ = 0;
-                                        }
-                                        else
-                                        {
-                                            kq.Balace_Stock_ = Convert.ToInt32(replace_balance1);
-                                        }
-                                        db.SaveChanges();
-                                    }
-                                    else
-                                    {
-                                        psi_wm_ref.Code = (((Excel.Range)range.Cells[row, 3]).Text);
-                                        psi_wm_ref.Description = (((Excel.Range)range.Cells[row, 4]).Text);
-                                        string date = ((Excel.Range)range.Cells[row2, col]).Text;
-                                        psi_wm_ref.Date = Convert.ToDateTime(date);
-                                        int t1 = row2 + 2;
-                                        string t3 = ((Excel.Range)range.Cells[t1, col]).Text;
-                                        string replace_number_plus = t3.Replace(".", "");
-                                        string replace_number = replace_number_plus.Replace(",", "");
-                                        if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
-                                        {
-                                            psi_wm_ref.Requirements = 0;
-                                        }
-                                        else
-                                        {
-                                            psi_wm_ref.Requirements = Convert.ToInt32(replace_number);
-                                        }
-
-                                        int t4 = row2 + 4;
-                                        char[] charsToTrim = { '(', ')' };
-                                        string balance_str = ((Excel.Range)range.Cells[t4, col]).Text;
-                                        string replace_balance_plus = balance_str.Replace(".", "");
-                                        string replace_balance = replace_balance_plus.Replace(",", "");
-                                        if (isNumber(replace_balance))
-                                        {
-                                            replace_balance1 = replace_balance.Trim(charsToTrim);
-                                            replace_balance1 = "-" + replace_balance1;
-                                        }
-                                        else
-                                        {
-                                            replace_balance1 = replace_balance;
-                                        }
-
-                                        if (replace_balance1 == "#NAME!" || replace_balance1 == "#N/A" || replace_balance1 == "#VALUE!" || replace_balance1 == "#REF!" || replace_balance1 == "#NUM!" || replace_balance1 == "#NULL" || replace_balance1 == "#DIV/0!" || replace_balance1 == "")
-                                        {
-                                            psi_wm_ref.Balace_Stock_ = 0;
-                                        }
-                                        else
-                                        {
-                                            psi_wm_ref.Balace_Stock_ = Convert.ToInt32(replace_balance1);
-                                        }
-                                        db.PSI_WM_REF.Add(psi_wm_ref);
-                                        db.SaveChanges();
-                                    }
-                                    
+                                    continue;
                                 }
-                                if (row > 7)
+                                PSI_WM_REF psi_wm_ref = new PSI_WM_REF();
+                                int row2 = 5;
+                                for (int col = 23; col <= range.Columns.Count; col++)
                                 {
-                                    string code_check = ((Excel.Range)range.Cells[row, 3]).Text;
-                                    string date_str = ((Excel.Range)range.Cells[row2, col]).Text;
-                                    DateTime date_check = Convert.ToDateTime(date_str);
-                                    var kq = db.PSI_WM_REF.Where(x => x.Date == date_check && x.Code == code_check).FirstOrDefault();
-                                    if(kq != null)
+                                    string replace_balance1;
+                                    if (IsDate(((Excel.Range)range.Cells[row2, col]).Text) == false)
                                     {
-                                        kq.Code = (((Excel.Range)range.Cells[row, 3]).Text);
-                                        kq.Description = (((Excel.Range)range.Cells[row, 4]).Text);
-                                        string date = ((Excel.Range)range.Cells[row2, col]).Text;
-                                        kq.Date = Convert.ToDateTime(date);
-                                        int t2 = temp + 7;
-                                        string t3 = ((Excel.Range)range.Cells[t2, col]).Text;
-                                        string replace_number_plus = t3.Replace(".", "");
-                                        string replace_number = replace_number_plus.Replace(",", "");
-                                        if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
-                                        {
-                                            kq.Requirements = 0;
-                                        }
-                                        else
-                                        {
-                                            kq.Requirements = Convert.ToInt32(replace_number);
-                                        }
-
-                                        int t4 = temp + 9;
-                                        char[] charsToTrim = { '(', ')' };
-                                        string balance_str = ((Excel.Range)range.Cells[t4, col]).Text;
-                                        string replace_balance_plus = balance_str.Replace(".", "");
-                                        string replace_balance = replace_balance_plus.Replace(",", "");
-
-                                        if (isNumber(replace_balance))
-                                        {
-                                            replace_balance1 = replace_balance.Trim(charsToTrim);
-                                            replace_balance1 = "-" + replace_balance1;
-                                        }
-                                        else
-                                        {
-                                            replace_balance1 = replace_balance;
-                                        }
-
-                                        if (replace_balance1 == "#NAME!" || replace_balance1 == "#N/A" || replace_balance1 == "#VALUE!" || replace_balance1 == "#REF!" || replace_balance1 == "#NUM!" || replace_balance1 == "#NULL" || replace_balance1 == "#DIV/0!" || replace_balance1 == "")
-                                        {
-                                            kq.Balace_Stock_ = 0;
-                                        }
-                                        else
-                                        {
-                                            kq.Balace_Stock_ = Convert.ToInt32(replace_balance1);
-                                        }
-                                        db.SaveChanges();
+                                        continue;
                                     }
-                                    else
+                                    if (row == 7)
                                     {
-                                        psi_wm_ref.Code = (((Excel.Range)range.Cells[row, 3]).Text);
-                                        psi_wm_ref.Description = (((Excel.Range)range.Cells[row, 4]).Text);
-                                        string date = ((Excel.Range)range.Cells[row2, col]).Text;
-                                        psi_wm_ref.Date = Convert.ToDateTime(date);
-                                        int t2 = temp + 7;
-                                        string t3 = ((Excel.Range)range.Cells[t2, col]).Text;
-                                        string replace_number_plus = t3.Replace(".", "");
-                                        string replace_number = replace_number_plus.Replace(",", "");
-                                        if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
+                                        string code_check = ((Excel.Range)range.Cells[row, 3]).Text;
+                                        string date_str = ((Excel.Range)range.Cells[row2, col]).Text;
+                                        DateTime date_check = Convert.ToDateTime(date_str);
+                                        var kq = db.PSI_WM_REF.Where(x => x.Date == date_check && x.Code == code_check).FirstOrDefault();
+                                        if (kq != null)
                                         {
-                                            psi_wm_ref.Requirements = 0;
+                                            kq.Code = (((Excel.Range)range.Cells[row, 3]).Text);
+                                            kq.Description = (((Excel.Range)range.Cells[row, 4]).Text);
+                                            string date = ((Excel.Range)range.Cells[row2, col]).Text;
+                                            kq.Date = Convert.ToDateTime(date);
+                                            int t1 = row2 + 2;
+                                            string t3 = ((Excel.Range)range.Cells[t1, col]).Text;
+                                            string replace_number_plus = t3.Replace(".", "");
+                                            string replace_number = replace_number_plus.Replace(",", "");
+                                            if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
+                                            {
+                                                psi_wm_ref.Requirements = 0;
+                                            }
+                                            else
+                                            {
+                                                kq.Requirements = Convert.ToInt32(replace_number);
+                                            }
+
+                                            int t4 = row2 + 4;
+                                            char[] charsToTrim = { '(', ')' };
+                                            string balance_str = ((Excel.Range)range.Cells[t4, col]).Text;
+                                            string replace_balance_plus = balance_str.Replace(".", "");
+                                            string replace_balance = replace_balance_plus.Replace(",", "");
+                                            if (isNumber(replace_balance))
+                                            {
+                                                replace_balance1 = replace_balance.Trim(charsToTrim);
+                                                replace_balance1 = "-" + replace_balance1;
+                                            }
+                                            else
+                                            {
+                                                replace_balance1 = replace_balance;
+                                            }
+
+                                            if (replace_balance1 == "#NAME!" || replace_balance1 == "#N/A" || replace_balance1 == "#VALUE!" || replace_balance1 == "#REF!" || replace_balance1 == "#NUM!" || replace_balance1 == "#NULL" || replace_balance1 == "#DIV/0!" || replace_balance1 == "")
+                                            {
+                                                kq.Balace_Stock_ = 0;
+                                            }
+                                            else
+                                            {
+                                                kq.Balace_Stock_ = Convert.ToInt32(replace_balance1);
+                                            }
+                                            db.SaveChanges();
                                         }
                                         else
                                         {
-                                            psi_wm_ref.Requirements = Convert.ToInt32(replace_number);
+                                            psi_wm_ref.Code = (((Excel.Range)range.Cells[row, 3]).Text);
+                                            psi_wm_ref.Description = (((Excel.Range)range.Cells[row, 4]).Text);
+                                            string date = ((Excel.Range)range.Cells[row2, col]).Text;
+                                            psi_wm_ref.Date = Convert.ToDateTime(date);
+                                            int t1 = row2 + 2;
+                                            string t3 = ((Excel.Range)range.Cells[t1, col]).Text;
+                                            string replace_number_plus = t3.Replace(".", "");
+                                            string replace_number = replace_number_plus.Replace(",", "");
+                                            if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
+                                            {
+                                                psi_wm_ref.Requirements = 0;
+                                            }
+                                            else
+                                            {
+                                                psi_wm_ref.Requirements = Convert.ToInt32(replace_number);
+                                            }
+
+                                            int t4 = row2 + 4;
+                                            char[] charsToTrim = { '(', ')' };
+                                            string balance_str = ((Excel.Range)range.Cells[t4, col]).Text;
+                                            string replace_balance_plus = balance_str.Replace(".", "");
+                                            string replace_balance = replace_balance_plus.Replace(",", "");
+                                            if (isNumber(replace_balance))
+                                            {
+                                                replace_balance1 = replace_balance.Trim(charsToTrim);
+                                                replace_balance1 = "-" + replace_balance1;
+                                            }
+                                            else
+                                            {
+                                                replace_balance1 = replace_balance;
+                                            }
+
+                                            if (replace_balance1 == "#NAME!" || replace_balance1 == "#N/A" || replace_balance1 == "#VALUE!" || replace_balance1 == "#REF!" || replace_balance1 == "#NUM!" || replace_balance1 == "#NULL" || replace_balance1 == "#DIV/0!" || replace_balance1 == "")
+                                            {
+                                                psi_wm_ref.Balace_Stock_ = 0;
+                                            }
+                                            else
+                                            {
+                                                psi_wm_ref.Balace_Stock_ = Convert.ToInt32(replace_balance1);
+                                            }
+                                            db.PSI_WM_REF.Add(psi_wm_ref);
+                                            db.SaveChanges();
                                         }
 
-                                        int t4 = temp + 9;
-                                        char[] charsToTrim = { '(', ')' };
-                                        string balance_str = ((Excel.Range)range.Cells[t4, col]).Text;
-                                        string replace_balance_plus = balance_str.Replace(".", "");
-                                        string replace_balance = replace_balance_plus.Replace(",", "");
-
-                                        if (isNumber(replace_balance))
+                                    }
+                                    if (row > 7)
+                                    {
+                                        string code_check = ((Excel.Range)range.Cells[row, 3]).Text;
+                                        string date_str = ((Excel.Range)range.Cells[row2, col]).Text;
+                                        DateTime date_check = Convert.ToDateTime(date_str);
+                                        var kq = db.PSI_WM_REF.Where(x => x.Date == date_check && x.Code == code_check).FirstOrDefault();
+                                        if (kq != null)
                                         {
-                                            replace_balance1 = replace_balance.Trim(charsToTrim);
-                                            replace_balance1 = "-" + replace_balance1;
+                                            kq.Code = (((Excel.Range)range.Cells[row, 3]).Text);
+                                            kq.Description = (((Excel.Range)range.Cells[row, 4]).Text);
+                                            string date = ((Excel.Range)range.Cells[row2, col]).Text;
+                                            kq.Date = Convert.ToDateTime(date);
+                                            int t2 = temp + 7;
+                                            string t3 = ((Excel.Range)range.Cells[t2, col]).Text;
+                                            string replace_number_plus = t3.Replace(".", "");
+                                            string replace_number = replace_number_plus.Replace(",", "");
+                                            if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
+                                            {
+                                                kq.Requirements = 0;
+                                            }
+                                            else
+                                            {
+                                                kq.Requirements = Convert.ToInt32(replace_number);
+                                            }
+
+                                            int t4 = temp + 9;
+                                            char[] charsToTrim = { '(', ')' };
+                                            string balance_str = ((Excel.Range)range.Cells[t4, col]).Text;
+                                            string replace_balance_plus = balance_str.Replace(".", "");
+                                            string replace_balance = replace_balance_plus.Replace(",", "");
+
+                                            if (isNumber(replace_balance))
+                                            {
+                                                replace_balance1 = replace_balance.Trim(charsToTrim);
+                                                replace_balance1 = "-" + replace_balance1;
+                                            }
+                                            else
+                                            {
+                                                replace_balance1 = replace_balance;
+                                            }
+
+                                            if (replace_balance1 == "#NAME!" || replace_balance1 == "#N/A" || replace_balance1 == "#VALUE!" || replace_balance1 == "#REF!" || replace_balance1 == "#NUM!" || replace_balance1 == "#NULL" || replace_balance1 == "#DIV/0!" || replace_balance1 == "")
+                                            {
+                                                kq.Balace_Stock_ = 0;
+                                            }
+                                            else
+                                            {
+                                                kq.Balace_Stock_ = Convert.ToInt32(replace_balance1);
+                                            }
+                                            db.SaveChanges();
                                         }
                                         else
                                         {
-                                            replace_balance1 = replace_balance;
-                                        }
+                                            psi_wm_ref.Code = (((Excel.Range)range.Cells[row, 3]).Text);
+                                            psi_wm_ref.Description = (((Excel.Range)range.Cells[row, 4]).Text);
+                                            string date = ((Excel.Range)range.Cells[row2, col]).Text;
+                                            psi_wm_ref.Date = Convert.ToDateTime(date);
+                                            int t2 = temp + 7;
+                                            string t3 = ((Excel.Range)range.Cells[t2, col]).Text;
+                                            string replace_number_plus = t3.Replace(".", "");
+                                            string replace_number = replace_number_plus.Replace(",", "");
+                                            if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
+                                            {
+                                                psi_wm_ref.Requirements = 0;
+                                            }
+                                            else
+                                            {
+                                                psi_wm_ref.Requirements = Convert.ToInt32(replace_number);
+                                            }
 
-                                        if (replace_balance1 == "#NAME!" || replace_balance1 == "#N/A" || replace_balance1 == "#VALUE!" || replace_balance1 == "#REF!" || replace_balance1 == "#NUM!" || replace_balance1 == "#NULL" || replace_balance1 == "#DIV/0!" || replace_balance1 == "")
-                                        {
-                                            psi_wm_ref.Balace_Stock_ = 0;
+                                            int t4 = temp + 9;
+                                            char[] charsToTrim = { '(', ')' };
+                                            string balance_str = ((Excel.Range)range.Cells[t4, col]).Text;
+                                            string replace_balance_plus = balance_str.Replace(".", "");
+                                            string replace_balance = replace_balance_plus.Replace(",", "");
+
+                                            if (isNumber(replace_balance))
+                                            {
+                                                replace_balance1 = replace_balance.Trim(charsToTrim);
+                                                replace_balance1 = "-" + replace_balance1;
+                                            }
+                                            else
+                                            {
+                                                replace_balance1 = replace_balance;
+                                            }
+
+                                            if (replace_balance1 == "#NAME!" || replace_balance1 == "#N/A" || replace_balance1 == "#VALUE!" || replace_balance1 == "#REF!" || replace_balance1 == "#NUM!" || replace_balance1 == "#NULL" || replace_balance1 == "#DIV/0!" || replace_balance1 == "")
+                                            {
+                                                psi_wm_ref.Balace_Stock_ = 0;
+                                            }
+                                            else
+                                            {
+                                                psi_wm_ref.Balace_Stock_ = Convert.ToInt32(replace_balance1);
+                                            }
+                                            db.PSI_WM_REF.Add(psi_wm_ref);
+                                            db.SaveChanges();
                                         }
-                                        else
-                                        {
-                                            psi_wm_ref.Balace_Stock_ = Convert.ToInt32(replace_balance1);
-                                        }
-                                        db.PSI_WM_REF.Add(psi_wm_ref);
-                                        db.SaveChanges();
                                     }
                                 }
+                                temp += 5;
+                                row += 4;
                             }
-                            temp += 5;
-                            row += 4;
+                            workbook.Close(0);
+                            app.Quit();
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(workbook);
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(app);
+                            System.IO.File.Delete(path);
+                            return RedirectToAction("Import_Succeeded");
                         }
+                        catch
+                        {
+                            workbook.Close(0);
+                            app.Quit();
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(workbook);
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(app);
+                            System.IO.File.Delete(path);
+                            return RedirectToAction("NotFound");
+                        }
+                    }
+                    catch
+                    {
                         workbook.Close(0);
                         app.Quit();
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(workbook);
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(app);
                         System.IO.File.Delete(path);
-                        return RedirectToAction("Import_Succeeded");
-                    }
-                    else
-                    {
-                         
-                        ViewBag.Error = "File Excel không đúng";
-                        return RedirectToAction("Import_PSI_WM_REF");
+                        ViewBag.ErrorWorksheet1 = "Không tìm thấy sheet PSI WM REF!";
+                        return View("Import_PSI_WM_REF");
                     }
                 }
                 else
                 {
-                    ViewBag.Error = "Chưa Chọn File";
-                    return RedirectToAction("Import_PSI_WM_REF");
+
+                    ViewBag.Error1 = "File Excel không đúng";
+                    return View("Import_PSI_WM_REF");
                 }
             }
-            catch
+            else
             {
-                return RedirectToAction("NotFound");
+                ViewBag.Error1 = "Chưa Chọn File";
+                return View("Import_PSI_WM_REF");
             }
         }
 
@@ -663,171 +681,190 @@ namespace Plan.Controllers
         [HasCredentialAttribute.HasCredential(RoleID = "IMPORT_PSI")]
         public ActionResult Import_PSI_VC(HttpPostedFileBase file)
         {
-            try
+            if (file != null && file.ContentLength > 0)
             {
-                if (file != null && file.ContentLength > 0)
+                if (file.FileName.EndsWith("xls") || file.FileName.EndsWith("xlsx"))
                 {
-                    if (file.FileName.EndsWith("xls") || file.FileName.EndsWith("xlsx"))
+                    string path = Server.MapPath("~/Content/Files/") + Path.GetFileName(file.FileName);
+                    file.SaveAs(path);
+                    Excel.Application app = new Excel.Application();
+                    //app.Visible = true;
+                    Excel.Workbook workbook = app.Workbooks.Open(path);
+                    try
                     {
-                        string path = Server.MapPath("~/Content/Files/") + Path.GetFileName(file.FileName);
-                        file.SaveAs(path);
-                        Excel.Application app = new Excel.Application();
-                        //app.Visible = true;
-                        Excel.Workbook workbook = app.Workbooks.Open(path);
                         Excel.Worksheet worksheet = workbook.Worksheets["PSI VC"];
+                        //Excel.Worksheet worksheet = workbook.Worksheets["Daily FC"];
                         worksheet.Columns.AutoFit();
                         //worksheet.Rows.AutoFit();
                         Excel.Range range = worksheet.UsedRange;
-                        int temp = 0;
-                        for (int row = 4; row <= range.Rows.Count; row++)
+                        try
                         {
-                            if (((Excel.Range)range.Cells[row, 3]).Text == "")
+                            int temp = 0;
+                            for (int row = 4; row <= range.Rows.Count; row++)
                             {
-                                continue;
-                            }
-                            PSI_V_C psi_vc = new PSI_V_C();
-                            int row2 = 3;
-                            for (int col = 15; col <= range.Columns.Count; col++)
-                            {
-                                if (IsDate(((Excel.Range)range.Cells[row2, col]).Text) == false)
+                                if (((Excel.Range)range.Cells[row, 3]).Text == "")
                                 {
                                     continue;
                                 }
-                                if (row == 4)
+                                PSI_V_C psi_vc = new PSI_V_C();
+                                int row2 = 3;
+                                for (int col = 15; col <= range.Columns.Count; col++)
                                 {
-                                    string code_check = ((Excel.Range)range.Cells[row, 3]).Text;
-                                    string demand = ((Excel.Range)range.Cells[1, col]).Text;
-                                    if (demand == "Balance")
+                                    if (IsDate(((Excel.Range)range.Cells[row2, col]).Text) == false)
                                     {
-                                        break;
+                                        continue;
                                     }
-                                    string date_str = ((Excel.Range)range.Cells[row2, col]).Text;
-                                    DateTime date_check = Convert.ToDateTime(date_str);
-                                    var kq = db.PSI_V_C.Where(x => x.Date == date_check && x.Code == code_check).FirstOrDefault();
-                                    if (kq != null)
+                                    if (row == 4)
                                     {
-                                        kq.Code = (((Excel.Range)range.Cells[row, 3]).Text);
-
-                                        kq.Description = (((Excel.Range)range.Cells[row, 4]).Text);
-                                        string date = ((Excel.Range)range.Cells[row2, col]).Text;
-                                        kq.Date = Convert.ToDateTime(date);
-                                        int t1 = row2 + 1;
-                                        string t3 = ((Excel.Range)range.Cells[t1, col]).Text;
-                                        string replace_number = t3.Replace(",", "");
-                                        replace_number = replace_number.Replace(".", "");
-                                        if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
+                                        string code_check = ((Excel.Range)range.Cells[row, 3]).Text;
+                                        string demand = ((Excel.Range)range.Cells[1, col]).Text;
+                                        if (demand == "Balance")
                                         {
-                                            kq.Requirement = 0;
+                                            break;
+                                        }
+                                        string date_str = ((Excel.Range)range.Cells[row2, col]).Text;
+                                        DateTime date_check = Convert.ToDateTime(date_str);
+                                        var kq = db.PSI_V_C.Where(x => x.Date == date_check && x.Code == code_check).FirstOrDefault();
+                                        if (kq != null)
+                                        {
+                                            kq.Code = (((Excel.Range)range.Cells[row, 3]).Text);
+
+                                            kq.Description = (((Excel.Range)range.Cells[row, 4]).Text);
+                                            string date = ((Excel.Range)range.Cells[row2, col]).Text;
+                                            kq.Date = Convert.ToDateTime(date);
+                                            int t1 = row2 + 1;
+                                            string t3 = ((Excel.Range)range.Cells[t1, col]).Text;
+                                            string replace_number = t3.Replace(",", "");
+                                            replace_number = replace_number.Replace(".", "");
+                                            if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
+                                            {
+                                                kq.Requirement = 0;
+                                            }
+                                            else
+                                            {
+                                                kq.Requirement = Convert.ToInt32(replace_number);
+                                            }
+                                            db.SaveChanges();
                                         }
                                         else
                                         {
-                                            kq.Requirement = Convert.ToInt32(replace_number);
-                                        }
-                                        db.SaveChanges();
-                                    }
-                                    else
-                                    {
-                                        psi_vc.Code = (((Excel.Range)range.Cells[row, 3]).Text);
+                                            psi_vc.Code = (((Excel.Range)range.Cells[row, 3]).Text);
 
-                                        psi_vc.Description = (((Excel.Range)range.Cells[row, 4]).Text);
-                                        string date = ((Excel.Range)range.Cells[row2, col]).Text;
-                                        psi_vc.Date = Convert.ToDateTime(date);
-                                        int t1 = row2 + 1;
-                                        string t3 = ((Excel.Range)range.Cells[t1, col]).Text;
-                                        string replace_number = t3.Replace(",", "");
-                                        replace_number = replace_number.Replace(".", "");
-                                        if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
+                                            psi_vc.Description = (((Excel.Range)range.Cells[row, 4]).Text);
+                                            string date = ((Excel.Range)range.Cells[row2, col]).Text;
+                                            psi_vc.Date = Convert.ToDateTime(date);
+                                            int t1 = row2 + 1;
+                                            string t3 = ((Excel.Range)range.Cells[t1, col]).Text;
+                                            string replace_number = t3.Replace(",", "");
+                                            replace_number = replace_number.Replace(".", "");
+                                            if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
+                                            {
+                                                psi_vc.Requirement = 0;
+                                            }
+                                            else
+                                            {
+                                                psi_vc.Requirement = Convert.ToInt32(replace_number);
+                                            }
+                                            db.PSI_V_C.Add(psi_vc);
+                                            db.SaveChanges();
+                                        }
+                                    }
+                                    if (row > 4)
+                                    {
+                                        string code_check = ((Excel.Range)range.Cells[row, 3]).Text;
+                                        string demand = ((Excel.Range)range.Cells[1, col]).Text;
+                                        if (demand == "Balance")
                                         {
-                                            psi_vc.Requirement = 0;
+                                            break;
+                                        }
+                                        string date_str = ((Excel.Range)range.Cells[row2, col]).Text;
+                                        DateTime date_check = Convert.ToDateTime(date_str);
+                                        var kq = db.PSI_V_C.Where(x => x.Date == date_check && x.Code == code_check).FirstOrDefault();
+                                        if (kq != null)
+                                        {
+                                            kq.Code = (((Excel.Range)range.Cells[row, 3]).Text);
+
+                                            kq.Description = (((Excel.Range)range.Cells[row, 4]).Text);
+                                            string date = ((Excel.Range)range.Cells[row2, col]).Text;
+                                            kq.Date = Convert.ToDateTime(date);
+                                            int t2 = temp + 4;
+                                            string t3 = ((Excel.Range)range.Cells[t2, col]).Text;
+                                            string replace_number = t3.Replace(",", "");
+                                            replace_number = replace_number.Replace(".", "");
+                                            if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
+                                            {
+                                                kq.Requirement = 0;
+                                            }
+                                            else
+                                            {
+                                                kq.Requirement = Convert.ToInt32(replace_number);
+                                            }
+                                            db.SaveChanges();
                                         }
                                         else
                                         {
-                                            psi_vc.Requirement = Convert.ToInt32(replace_number);
+                                            psi_vc.Code = (((Excel.Range)range.Cells[row, 3]).Text);
+
+                                            psi_vc.Description = (((Excel.Range)range.Cells[row, 4]).Text);
+                                            string date = ((Excel.Range)range.Cells[row2, col]).Text;
+                                            psi_vc.Date = Convert.ToDateTime(date);
+                                            int t2 = temp + 4;
+                                            string t3 = ((Excel.Range)range.Cells[t2, col]).Text;
+                                            string replace_number = t3.Replace(",", "");
+                                            replace_number = replace_number.Replace(",", "");
+                                            if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
+                                            {
+                                                psi_vc.Requirement = 0;
+                                            }
+                                            else
+                                            {
+                                                psi_vc.Requirement = Convert.ToInt32(replace_number);
+                                            }
+                                            db.PSI_V_C.Add(psi_vc);
+                                            db.SaveChanges();
                                         }
-                                        db.PSI_V_C.Add(psi_vc);
-                                        db.SaveChanges();
                                     }
                                 }
-                                if (row > 4)
-                                {
-                                    string code_check = ((Excel.Range)range.Cells[row, 3]).Text;
-                                    string demand = ((Excel.Range)range.Cells[1, col]).Text;
-                                    if (demand == "Balance")
-                                    {
-                                        break;
-                                    }
-                                    string date_str = ((Excel.Range)range.Cells[row2, col]).Text;
-                                    DateTime date_check = Convert.ToDateTime(date_str);
-                                    var kq = db.PSI_V_C.Where(x => x.Date == date_check && x.Code == code_check).FirstOrDefault();
-                                    if (kq != null)
-                                    {
-                                        kq.Code = (((Excel.Range)range.Cells[row, 3]).Text);
-
-                                        kq.Description = (((Excel.Range)range.Cells[row, 4]).Text);
-                                        string date = ((Excel.Range)range.Cells[row2, col]).Text;
-                                        kq.Date = Convert.ToDateTime(date);
-                                        int t2 = temp + 4;
-                                        string t3 = ((Excel.Range)range.Cells[t2, col]).Text;
-                                        string replace_number = t3.Replace(",", "");
-                                        replace_number = replace_number.Replace(".", "");
-                                        if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
-                                        {
-                                            kq.Requirement = 0;
-                                        }
-                                        else
-                                        {
-                                            kq.Requirement = Convert.ToInt32(replace_number);
-                                        }
-                                        db.SaveChanges();
-                                    }
-                                    else
-                                    {
-                                        psi_vc.Code = (((Excel.Range)range.Cells[row, 3]).Text);
-
-                                        psi_vc.Description = (((Excel.Range)range.Cells[row, 4]).Text);
-                                        string date = ((Excel.Range)range.Cells[row2, col]).Text;
-                                        psi_vc.Date = Convert.ToDateTime(date);
-                                        int t2 = temp + 4;
-                                        string t3 = ((Excel.Range)range.Cells[t2, col]).Text;
-                                        string replace_number = t3.Replace(",", "");
-                                        replace_number = replace_number.Replace(",", "");
-                                        if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
-                                        {
-                                            psi_vc.Requirement = 0;
-                                        }
-                                        else
-                                        {
-                                            psi_vc.Requirement = Convert.ToInt32(replace_number);
-                                        }
-                                        db.PSI_V_C.Add(psi_vc);
-                                        db.SaveChanges();
-                                    }
-                                }
+                                temp += 1;
                             }
-                            temp += 1;
+                            workbook.Close(0);
+                            app.Quit();
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(workbook);
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(app);
+                            System.IO.File.Delete(path);
+                            return RedirectToAction("Import_Succeeded");
                         }
+                        catch
+                        {
+                            workbook.Close(0);
+                            app.Quit();
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(workbook);
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(app);
+                            System.IO.File.Delete(path);
+                            return RedirectToAction("NotFound");
+                        }
+                    }
+                    catch
+                    {
                         workbook.Close(0);
                         app.Quit();
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(workbook);
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(app);
                         System.IO.File.Delete(path);
-                        return RedirectToAction("Import_Succeeded");
-                    }
-                    else
-                    {
-                        ViewBag.Error = "File Excel không đúng";
-                        return RedirectToAction("Import_PSI_WM_REF");
+                        ViewBag.ErrorWorksheet2 = "Không tìm thấy sheet PSI VC!";
+                        return View("Import_PSI_WM_REF");
                     }
                 }
                 else
                 {
-                    ViewBag.Error = "Chưa Chọn File";
-                    return RedirectToAction("Import_PSI_WM_REF");
+                    ViewBag.Error2 = "File Excel không đúng";
+                    return View("Import_PSI_WM_REF");
                 }
             }
-            catch
+            else
             {
-                return RedirectToAction("NotFound");
+                ViewBag.Error2 = "Chưa Chọn File";
+                return View("Import_PSI_WM_REF");
             }
         }
 
@@ -836,151 +873,169 @@ namespace Plan.Controllers
         [HasCredentialAttribute.HasCredential(RoleID = "IMPORT_PSI")]
         public ActionResult Import_Assy_PSI_Shortage(HttpPostedFileBase file)
         {
-            try
+            if (file != null && file.ContentLength > 0)
             {
-                if (file != null && file.ContentLength > 0)
+                if (file.FileName.EndsWith("xls") || file.FileName.EndsWith("xlsx"))
                 {
-                    if (file.FileName.EndsWith("xls") || file.FileName.EndsWith("xlsx"))
+                    string path = Server.MapPath("~/Content/Files/") + Path.GetFileName(file.FileName);
+                    file.SaveAs(path);
+                    Excel.Application app = new Excel.Application();
+                    Excel.Workbook workbook = app.Workbooks.Open(path);
+                    //app.Visible = true;
+                    try
                     {
-                        string path = Server.MapPath("~/Content/Files/") + Path.GetFileName(file.FileName);
-                        file.SaveAs(path);
-                        Excel.Application app = new Excel.Application();
-                        Excel.Workbook workbook = app.Workbooks.Open(path);
-                        //app.Visible = true;
                         Excel.Worksheet worksheet = workbook.Worksheets["Assy PSI Shortage"];
                         worksheet.Columns.AutoFit();
                         //worksheet.Rows.AutoFit();
                         Excel.Range range = worksheet.UsedRange;
-                        int temp = 0;
-                        int coltemp = 57;
-                        for (int row = 3; row <= range.Rows.Count; row++)
+                        try
                         {
-                            if (((Excel.Range)range.Cells[row, coltemp]).Text == "")
+                            int temp = 0;
+                            int coltemp = 57;
+                            for (int row = 3; row <= range.Rows.Count; row++)
                             {
-                                continue;
-                            }
-                            Assy_PSI_Shortage assy_psi_shortage = new Assy_PSI_Shortage();
-                            int row2 = 2;
-                            for (int col = 52; col <= range.Columns.Count; col++)
-                            {
-                                if (IsDate(((Excel.Range)range.Cells[row2, col]).Text) == false)
+                                if (((Excel.Range)range.Cells[row, coltemp]).Text == "")
                                 {
                                     continue;
                                 }
-                                if (row == 3)
+                                Assy_PSI_Shortage assy_psi_shortage = new Assy_PSI_Shortage();
+                                int row2 = 2;
+                                for (int col = 52; col <= range.Columns.Count; col++)
                                 {
-                                    string code_check = ((Excel.Range)range.Cells[row, coltemp]).Text;
-                                    string date_str = ((Excel.Range)range.Cells[row2, col]).Text;
-                                    DateTime date_check = Convert.ToDateTime(date_str);
-                                    var kq = db.Assy_PSI_Shortage.Where(x => x.Date == date_check && x.Code == code_check).FirstOrDefault();
-                                    if (kq != null)
+                                    if (IsDate(((Excel.Range)range.Cells[row2, col]).Text) == false)
                                     {
-                                        kq.Code = (((Excel.Range)range.Cells[row, coltemp]).Text);
-                                        string date = ((Excel.Range)range.Cells[row2, col]).Text;
-                                        kq.Date = Convert.ToDateTime(date);
-                                        int t1 = row2 + 1;
-                                        string t3 = ((Excel.Range)range.Cells[t1, col]).Text;
-                                        string replace_number = t3.Replace(",", "");
-                                        if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
-                                        {
-                                            kq.Requirement = 0;
-                                        }
-                                        else
-                                        {
-                                            kq.Requirement = Convert.ToInt32(t3);
-                                        }
-                                        db.SaveChanges();
+                                        continue;
                                     }
-                                    else
+                                    if (row == 3)
                                     {
-                                        assy_psi_shortage.Code = (((Excel.Range)range.Cells[row, coltemp]).Text);
-                                        string date = ((Excel.Range)range.Cells[row2, col]).Text;
-                                        assy_psi_shortage.Date = Convert.ToDateTime(date);
-                                        int t1 = row2 + 1;
-                                        string t3 = ((Excel.Range)range.Cells[t1, col]).Text;
-                                        string replace_number = t3.Replace(",", "");
-                                        if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
+                                        string code_check = ((Excel.Range)range.Cells[row, coltemp]).Text;
+                                        string date_str = ((Excel.Range)range.Cells[row2, col]).Text;
+                                        DateTime date_check = Convert.ToDateTime(date_str);
+                                        var kq = db.Assy_PSI_Shortage.Where(x => x.Date == date_check && x.Code == code_check).FirstOrDefault();
+                                        if (kq != null)
                                         {
-                                            assy_psi_shortage.Requirement = 0;
+                                            kq.Code = (((Excel.Range)range.Cells[row, coltemp]).Text);
+                                            string date = ((Excel.Range)range.Cells[row2, col]).Text;
+                                            kq.Date = Convert.ToDateTime(date);
+                                            int t1 = row2 + 1;
+                                            string t3 = ((Excel.Range)range.Cells[t1, col]).Text;
+                                            string replace_number = t3.Replace(",", "");
+                                            if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
+                                            {
+                                                kq.Requirement = 0;
+                                            }
+                                            else
+                                            {
+                                                kq.Requirement = Convert.ToInt32(t3);
+                                            }
+                                            db.SaveChanges();
                                         }
                                         else
                                         {
-                                            assy_psi_shortage.Requirement = Convert.ToInt32(t3);
+                                            assy_psi_shortage.Code = (((Excel.Range)range.Cells[row, coltemp]).Text);
+                                            string date = ((Excel.Range)range.Cells[row2, col]).Text;
+                                            assy_psi_shortage.Date = Convert.ToDateTime(date);
+                                            int t1 = row2 + 1;
+                                            string t3 = ((Excel.Range)range.Cells[t1, col]).Text;
+                                            string replace_number = t3.Replace(",", "");
+                                            if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
+                                            {
+                                                assy_psi_shortage.Requirement = 0;
+                                            }
+                                            else
+                                            {
+                                                assy_psi_shortage.Requirement = Convert.ToInt32(t3);
+                                            }
+                                            db.Assy_PSI_Shortage.Add(assy_psi_shortage);
+                                            db.SaveChanges();
                                         }
-                                        db.Assy_PSI_Shortage.Add(assy_psi_shortage);
-                                        db.SaveChanges();
                                     }
-                                }
-                                if (row > 3)
-                                {
-                                    string code_check = ((Excel.Range)range.Cells[row, coltemp]).Text;
-                                    string date_str = ((Excel.Range)range.Cells[row2, col]).Text;
-                                    DateTime date_check = Convert.ToDateTime(date_str);
-                                    var kq = db.Assy_PSI_Shortage.Where(x => x.Date == date_check && x.Code == code_check).FirstOrDefault();
-                                    if (kq != null)
+                                    if (row > 3)
                                     {
-                                        kq.Code = (((Excel.Range)range.Cells[row, coltemp]).Text);
-                                        string date = ((Excel.Range)range.Cells[row2, col]).Text;
-                                        kq.Date = Convert.ToDateTime(date);
-                                        int t2 = temp + 3;
-                                        string t3 = ((Excel.Range)range.Cells[t2, col]).Text;
-                                        string replace_number = t3.Replace(",", "");
-                                        if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
+                                        string code_check = ((Excel.Range)range.Cells[row, coltemp]).Text;
+                                        string date_str = ((Excel.Range)range.Cells[row2, col]).Text;
+                                        DateTime date_check = Convert.ToDateTime(date_str);
+                                        var kq = db.Assy_PSI_Shortage.Where(x => x.Date == date_check && x.Code == code_check).FirstOrDefault();
+                                        if (kq != null)
                                         {
-                                            kq.Requirement = 0;
+                                            kq.Code = (((Excel.Range)range.Cells[row, coltemp]).Text);
+                                            string date = ((Excel.Range)range.Cells[row2, col]).Text;
+                                            kq.Date = Convert.ToDateTime(date);
+                                            int t2 = temp + 3;
+                                            string t3 = ((Excel.Range)range.Cells[t2, col]).Text;
+                                            string replace_number = t3.Replace(",", "");
+                                            if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
+                                            {
+                                                kq.Requirement = 0;
+                                            }
+                                            else
+                                            {
+                                                kq.Requirement = Convert.ToInt32(t3);
+                                            }
+                                            db.SaveChanges();
                                         }
                                         else
                                         {
-                                            kq.Requirement = Convert.ToInt32(t3);
-                                        }
-                                        db.SaveChanges();
-                                    }
-                                    else
-                                    {
-                                        assy_psi_shortage.Code = (((Excel.Range)range.Cells[row, coltemp]).Text);
-                                        string date = ((Excel.Range)range.Cells[row2, col]).Text;
-                                        assy_psi_shortage.Date = Convert.ToDateTime(date);
-                                        int t2 = temp + 3;
-                                        string t3 = ((Excel.Range)range.Cells[t2, col]).Text;
-                                        string replace_number = t3.Replace(",", "");
-                                        if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
-                                        {
-                                            assy_psi_shortage.Requirement = 0;
-                                        }
-                                        else
-                                        {
-                                            assy_psi_shortage.Requirement = Convert.ToInt32(t3);
-                                        }
+                                            assy_psi_shortage.Code = (((Excel.Range)range.Cells[row, coltemp]).Text);
+                                            string date = ((Excel.Range)range.Cells[row2, col]).Text;
+                                            assy_psi_shortage.Date = Convert.ToDateTime(date);
+                                            int t2 = temp + 3;
+                                            string t3 = ((Excel.Range)range.Cells[t2, col]).Text;
+                                            string replace_number = t3.Replace(",", "");
+                                            if (replace_number == "#NAME!" || replace_number == "#N/A" || replace_number == "#VALUE!" || replace_number == "#REF!" || replace_number == "#NUM!" || replace_number == "#NULL" || replace_number == "#DIV/0!" || replace_number == "")
+                                            {
+                                                assy_psi_shortage.Requirement = 0;
+                                            }
+                                            else
+                                            {
+                                                assy_psi_shortage.Requirement = Convert.ToInt32(t3);
+                                            }
 
-                                        db.Assy_PSI_Shortage.Add(assy_psi_shortage);
-                                        db.SaveChanges();
+                                            db.Assy_PSI_Shortage.Add(assy_psi_shortage);
+                                            db.SaveChanges();
+                                        }
                                     }
                                 }
+                                temp += 1;
                             }
-                            temp += 1;
+                            workbook.Close(0);
+                            app.Quit();
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(workbook);
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(app);
+                            System.IO.File.Delete(path);
+                            return RedirectToAction("Import_Succeeded");
                         }
+                        catch
+                        {
+                            workbook.Close(0);
+                            app.Quit();
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(workbook);
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(app);
+                            System.IO.File.Delete(path);
+                            return RedirectToAction("NotFound");
+                        }
+                    }
+                    catch
+                    {
                         workbook.Close(0);
                         app.Quit();
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(workbook);
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(app);
                         System.IO.File.Delete(path);
-                        return RedirectToAction("Import_Succeeded");
-                    }
-                    else
-                    {
-                        ViewBag.Error = "File Excel không đúng";
-                        return RedirectToAction("Import_PSI_WM_REF");
+                        ViewBag.ErrorWorksheet3 = "Không tìm thấy sheet Assy PSI Shortage!";
+                        return View("Import_PSI_WM_REF");
                     }
                 }
                 else
                 {
-                    ViewBag.Error = "Chưa Chọn File";
-                    return RedirectToAction("Import_PSI_WM_REF");
+                    ViewBag.Error3 = "File Excel không đúng";
+                    return View("Import_PSI_WM_REF");
                 }
             }
-            catch
+            else
             {
-                return RedirectToAction("NotFound");
+                ViewBag.Error3 = "Chưa Chọn File";
+                return View("Import_PSI_WM_REF");
             }
         }
 
@@ -989,58 +1044,76 @@ namespace Plan.Controllers
         [HasCredentialAttribute.HasCredential(RoleID = "IMPORT_STOCK")]
         public ActionResult Import_Stock(HttpPostedFileBase file)
         {
-            try
+            if (file != null && file.ContentLength > 0)
             {
-                if (file != null && file.ContentLength > 0)
+                if (file.FileName.EndsWith("xls") || file.FileName.EndsWith("xlsx"))
                 {
-                    if (file.FileName.EndsWith("xls") || file.FileName.EndsWith("xlsx"))
+                    string path = Server.MapPath("~/Content/Files/") + Path.GetFileName(file.FileName);
+                    file.SaveAs(path);
+                    Excel.Application app = new Excel.Application();
+                    //app.Visible = true;
+                    Excel.Workbook workbook = app.Workbooks.Open(path);
+                    try
                     {
-                        string path = Server.MapPath("~/Content/Files/") + Path.GetFileName(file.FileName);
-                        file.SaveAs(path);
-                        Excel.Application app = new Excel.Application();
-                        //app.Visible = true;
-                        Excel.Workbook workbook = app.Workbooks.Open(path);
                         Excel.Worksheet worksheet = workbook.Worksheets["Stock"];
                         worksheet.Columns.AutoFit();
                         //worksheet.Rows.AutoFit();
                         Excel.Range range = worksheet.UsedRange;
-                        for (int row = 2; row <= range.Rows.Count; row++)
+                        try
                         {
-                            if (((Excel.Range)range.Cells[row, 1]).Text == "")
+                            for (int row = 2; row <= range.Rows.Count; row++)
                             {
-                                continue;
+                                if (((Excel.Range)range.Cells[row, 1]).Text == "")
+                                {
+                                    continue;
+                                }
+                                Stock stock = new Stock();
+                                stock.Code = (((Excel.Range)range.Cells[row, 1]).Text);
+                                string str_stock = ((Excel.Range)range.Cells[row, 2]).Text;
+                                string replace_stock = str_stock.Replace(".", "");
+                                string replace_stock1 = replace_stock.Replace(",", "");
+                                stock.Stock1 = Convert.ToInt32(replace_stock1);
+                                db.Stocks.Add(stock);
+                                db.SaveChanges();
                             }
-                            Stock stock = new Stock();
-                            stock.Code = (((Excel.Range)range.Cells[row, 1]).Text);
-                            string str_stock = ((Excel.Range)range.Cells[row, 2]).Text;
-                            string replace_stock = str_stock.Replace(".", "");
-                            string replace_stock1 = replace_stock.Replace(",", "");
-                            stock.Stock1 = Convert.ToInt32(replace_stock1);
-                            db.Stocks.Add(stock);
-                            db.SaveChanges();
+                            workbook.Close(0);
+                            app.Quit();
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(workbook);
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(app);
+                            System.IO.File.Delete(path);
+                            return View("Import_Succeeded");
                         }
+                        catch
+                        {
+                            workbook.Close(0);
+                            app.Quit();
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(workbook);
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(app);
+                            System.IO.File.Delete(path);
+                            return View("NotFound");
+                        }
+                    }
+                    catch
+                    {
                         workbook.Close(0);
                         app.Quit();
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(workbook);
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(app);
                         System.IO.File.Delete(path);
-                        return View("Import_Succeeded");
-                    }
-                    else
-                    {
-                        ViewBag.Error = "File Excel không đúng";
-                        return RedirectToAction("Import_Stock");
+                        ViewBag.ErrorWorksheet4 = "Không tìm thấy sheet Stock!";
+                        return View("Import_PSI_WM_REF");
                     }
                 }
                 else
                 {
-                    ViewBag.Error = "Chưa Chọn File";
-                    return RedirectToAction("Import_Stock");
+                    ViewBag.Error4 = "File Excel không đúng";
+                    return View("Import_PSI_WM_REF");
                 }
             }
-            catch
+            else
             {
-                return View("NotFound");
+                ViewBag.Error4 = "Chưa Chọn File";
+                return View("Import_PSI_WM_REF");
             }
         }
 
@@ -1049,58 +1122,76 @@ namespace Plan.Controllers
         [HasCredentialAttribute.HasCredential(RoleID = "IMPORT_RESINSTOCK")]
         public ActionResult Import_ResinStock(HttpPostedFileBase file)
         {
-            try
+            if (file != null && file.ContentLength > 0)
             {
-                if (file != null && file.ContentLength > 0)
+                if (file.FileName.EndsWith("xls") || file.FileName.EndsWith("xlsx"))
                 {
-                    if (file.FileName.EndsWith("xls") || file.FileName.EndsWith("xlsx"))
+                    string path = Server.MapPath("~/Content/Files/") + Path.GetFileName(file.FileName);
+                    file.SaveAs(path);
+                    Excel.Application app = new Excel.Application();
+                    //app.Visible = true;
+                    Excel.Workbook workbook = app.Workbooks.Open(path);
+                    try
                     {
-                        string path = Server.MapPath("~/Content/Files/") + Path.GetFileName(file.FileName);
-                        file.SaveAs(path);
-                        Excel.Application app = new Excel.Application();
-                        //app.Visible = true;
-                        Excel.Workbook workbook = app.Workbooks.Open(path);
                         Excel.Worksheet worksheet = workbook.Worksheets["Resin Stock"];
                         worksheet.Columns.AutoFit();
                         //worksheet.Rows.AutoFit();
                         Excel.Range range = worksheet.UsedRange;
-                        for (int row = 2; row <= range.Rows.Count; row++)
+                        try
                         {
-                            if (((Excel.Range)range.Cells[row, 1]).Text == "")
+                            for (int row = 2; row <= range.Rows.Count; row++)
                             {
-                                continue;
+                                if (((Excel.Range)range.Cells[row, 1]).Text == "")
+                                {
+                                    continue;
+                                }
+                                ResinStock stock = new ResinStock();
+                                stock.Code = (((Excel.Range)range.Cells[row, 1]).Text);
+                                string str_stock = ((Excel.Range)range.Cells[row, 2]).Text;
+                                string replace_stock = str_stock.Replace(".", "");
+                                string replace_stock1 = replace_stock.Replace(",", "");
+                                stock.ResinStock1 = Convert.ToInt32(replace_stock1);
+                                db.ResinStocks.Add(stock);
+                                db.SaveChanges();
                             }
-                            ResinStock stock = new ResinStock();
-                            stock.Code = (((Excel.Range)range.Cells[row, 1]).Text);
-                            string str_stock = ((Excel.Range)range.Cells[row, 2]).Text;
-                            string replace_stock = str_stock.Replace(".", "");
-                            string replace_stock1 = replace_stock.Replace(",", "");
-                            stock.ResinStock1 = Convert.ToInt32(replace_stock1);
-                            db.ResinStocks.Add(stock);
-                            db.SaveChanges();
+                            workbook.Close(0);
+                            app.Quit();
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(workbook);
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(app);
+                            System.IO.File.Delete(path);
+                            return View("Import_Succeeded");
                         }
+                        catch
+                        {
+                            workbook.Close(0);
+                            app.Quit();
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(workbook);
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(app);
+                            System.IO.File.Delete(path);
+                            return View("NotFound");
+                        }
+                    }
+                    catch
+                    {
                         workbook.Close(0);
                         app.Quit();
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(workbook);
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(app);
                         System.IO.File.Delete(path);
-                        return View("Import_Succeeded");
-                    }
-                    else
-                    {
-                        ViewBag.Error = "File Excel không đúng";
-                        return RedirectToAction("Import_Stock");
+                        ViewBag.ErrorWorksheet5 = "Không tìm thấy sheet Resin Stock!";
+                        return View("Import_PSI_WM_REF");
                     }
                 }
                 else
                 {
-                    ViewBag.Error = "Chưa Chọn File";
-                    return RedirectToAction("Import_Stock");
+                    ViewBag.Error5 = "File Excel không đúng";
+                    return View("Import_PSI_WM_REF");
                 }
             }
-            catch
+            else
             {
-                return View("NotFound");
+                ViewBag.Error5 = "Chưa Chọn File";
+                return View("Import_PSI_WM_REF");
             }
         }
 
@@ -1730,7 +1821,6 @@ namespace Plan.Controllers
                             flag = true;
                         }
                     }
-                  
                 }
                 
                 if(strgoods2 != "")
